@@ -1,0 +1,13 @@
+<div class="signup-box">
+  <h1 class="cnt-txt">okay let's create a new space for your network</h1><br /> 
+  <h2 class="cnt-txt">this can be the name of your organisation for example. </h2>
+  <h2 class="cnt-txt">once set up you can invite other people to participate in activities associated with this network.</h2><br />
+  <%= simple_form_for @org do |f| %>
+    <%= f.input :name, label: false, placeholder: "enter the name of the network space you'd like to create" %>
+    <br />
+    <%= f.submit 'continue', class: 'btn btn-success' %>
+    <br /><br />
+    <h3 class="cnt-txt">if you'd like to join an existing network that someone has invited you to, please click here.</h3>
+  <% end %>
+</div>
+

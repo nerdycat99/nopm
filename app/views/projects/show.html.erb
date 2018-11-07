@@ -1,0 +1,16 @@
+<div class="signup-box">
+  <h1><%= @project.name %></h1><br />
+  <h2>summary</h2>
+  <h3>id number: <%= @project.id %></h3>
+  <h3>description: <%= @project.description %></h3>
+  <h3>status: <%= @project.status %></h3>
+  <br /><br /><br />
+
+  <h2>existing tasks for project</h2>
+  <% @project.tasks.each do |task| %>
+    <%= link_to task.title, org_project_task_path(current_user.org, @project.id, task.id), class: 'nav-link' %>
+  <% end %>
+  <br /><br />
+
+  <%= link_to 'create new task', new_org_project_task_path(current_user.org_id,@project.id), class: 'btn btn-success' %>
+</div>

@@ -1,0 +1,19 @@
+
+<div class="signup-box">
+  <% if current_user %>
+    <h1>management homepage: <%= current_user.org.name %></h1><br /><br />
+    <h2>owner of <%= current_user.org.name %></h2>
+    <h3>first name: <%= current_user.first_name %></h3>
+    <h3>last name: <%= current_user.last_name %></h3>
+    <h3>email: <%= current_user.email %></h3><br />
+  <% else %> 
+    <h1>no user logged in at present</h1>
+  <% end %>
+  <br /><br /><br />
+  <h2>my existing projects</h2><br />
+  <% current_user.org.projects.each do |project| %>
+    <%= link_to project.name, org_project_path(current_user.org, project), class: 'nav-link' %><br />
+  <% end %>
+  <br /><br /><br />
+  <%= link_to 'create new project', new_org_project_path(current_user.org.id), class: 'btn btn-success' %>
+</div>
