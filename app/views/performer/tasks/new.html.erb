@@ -1,11 +1,11 @@
 <div class="booyah-box col-10 offset-1">
   <h1>create a new task</h1>
   <%= @project.name %>
-    <%= simple_form_for @task, url: org_project_tasks_path(@project) do |f| %>
+    <%= simple_form_for @task, url: performer_org_project_tasks_path(@project) do |f| %>
     <%= f.input :title %>
     <%= f.input :description %>
     Date Due<br /> 
-    <%= f.date_field :due_date %>
+    <%= f.date_select :due_date %>
     <%= f.hidden_field :user_id, :id=>"user_id_field" %>
     <%= f.hidden_field :status, value: "NEW", autocomplete: "off" %>
     
@@ -22,7 +22,6 @@
 
     <%= f.submit 'create task', class: 'btn btn-success' %>
   
-
   
   <%= link_to 'create new user', new_umake_path(:source => "task-page", :projref => @project.id), class: 'btn btn-success' %>
   <% end %>

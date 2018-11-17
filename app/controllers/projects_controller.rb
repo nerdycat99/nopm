@@ -3,7 +3,7 @@ class ProjectsController < ApplicationController
   def new
     # @project = Project.new
     @org = Org.find(params[:org_id])
-    @project = Project.new
+    @project = Project.new 
   end
 
   def create
@@ -16,6 +16,10 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
   end
 
+
+  def edit
+    @project = Project.find(params[:id])
+  end
 
   private
 

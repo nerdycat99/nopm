@@ -1,0 +1,17 @@
+<div class="signup-box">
+  <% if current_user %>
+    <h1>task performer homepage: <%= current_user.org.name %></h1><br /><br />   
+  <% else %> 
+    <h1>no user logged in at present</h1>
+  <% end %>
+  <br /><br /><br />
+  <h2>existing projects I'm working on </h2><br />
+  <% current_user.org.projects.each do |project| %>
+    <% project.tasks.each do |task| %>
+      <% if task.user_id == current_user.id %>
+        <%= link_to project.name, performer_org_project_path(current_user.org, project), class: 'nav-link' %>
+        <% break %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

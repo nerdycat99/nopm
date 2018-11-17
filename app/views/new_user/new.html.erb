@@ -1,24 +1,12 @@
 
-<%= org_name = flash[:org_name] %>
-<%= org_id = flash[:org_id] %>
-<%= user_type = flash[:user_type] %>
-<% if user_type == 0 %>
-  <% status = "own" %>
-<% elsif user_type == 1 %>
-  <% status = "mng" %>
-<% else %>
-  <% status = "tsk" %>
-<% end %>
 
-<div class="signup-box">
-  <h1 class="cnt-txt">now let's create an account for you</h1><br /> 
-  <div class="cnt-txt">
-    <h2>we'll make sure you're the owner of <%= org_name %> too.</h2><br />
-  </div>
+<%# @user = User.new(:email => 'test@example.com', :password => 'password', :password_confirmation => 'password', :org_id => 106, :status => 2) %>
+<%# @user.save %>
 
+  <h1>create a new user</h1>
+  <form>
 
-  <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= devise_error_messages! %>
+<%= form_for @user, url: new_users_admin_path(@user) do |f| %>
     <div class="field cnt-txt">
       <%= f.text_field :first_name, autofocus: true, autocomplete: "off", placeholder: "first name" %>
     </div><br />
@@ -32,8 +20,8 @@
     </div><br />
 
     <div class="field">
-      <%= f.hidden_field :org_id, value: org_id, autocomplete: "off" %>
-      <%= f.hidden_field :status, value: status, autocomplete: "off" %>
+      <%= f.hidden_field :org_id, value: current_user.org_id, autocomplete: "off" %>
+      <%= f.hidden_field :status, value: 2, autocomplete: "off" %>
     </div>
     <br />
 
@@ -56,15 +44,4 @@
       <%= f.submit 'continue', class: 'btn btn-success' %>
       <br /><br />
     </div>
-  <% end %>
-</div>
-
-
-
-
-
-
-
-
-
-
+<% end %>

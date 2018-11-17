@@ -12,8 +12,10 @@
   <br /><br /><br />
   <h2>my existing projects</h2><br />
   <% current_user.org.projects.each do |project| %>
-    <%= link_to project.name, org_project_path(current_user.org, project), class: 'nav-link' %><br />
+    <%= link_to project.name, org_project_path(current_user.org, project), class: 'nav-link' %>
   <% end %>
   <br /><br /><br />
   <%= link_to 'create new project', new_org_project_path(current_user.org.id), class: 'btn btn-success' %>
+  <%= link_to 'create new user', new_umake_path(:source => "org-page"), class: 'btn btn-success' %>
+
 </div>

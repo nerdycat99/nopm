@@ -1,0 +1,65 @@
+
+<div class="booyah-box col-10 offset-1">
+  <h1>task performer projects page </h1>
+  <br /><br />
+  <h3>project name: <%= @project.name %></h3>
+  <h3>id number: <%= @project.id %></h3>
+  <h3>description: <%= @project.description %></h3>
+  <h3>status: <%= @project.status %></h3>
+  <br />
+</div>
+<br />
+
+<% @new_tasks = [] %>
+<% @inprog_tasks = [] %>
+<% @comp_tasks = [] %>
+<% @the_tasks %>
+<% title = "" %>
+
+
+<% @project.tasks.each do |task| %>
+  <% if task.status == "NEW" && task.user_id == current_user.id %>
+    <% @new_tasks << task %>
+  <% elsif task.user_id == current_user.id %>
+    <% @inprog_tasks << task %>
+  <% else %>
+    
+  <% end %>
+<% end %>
+
+
+<% 2.times do |i| %>
+  <% if i == 0 %>
+    <% @the_tasks = @new_tasks %>
+    <% title = "new tasks" %>
+  <% else %>
+    <% @the_tasks = @inprog_tasks %>
+    <% title = "in progress tasks" %>
+  <% end %>
+
+    <div class="booyah-box col-10 offset-1">
+      <h3><%= title %></h3>
+      <% @the_tasks.in_groups_of(3, false).each do |group| %>
+        <div class="row">
+            <% group.each do |item| %>
+              <div class="item col-4">
+                <div class="card">
+                  <h6><%= item.title %></h6> <br />
+                  <%= item.description %> <br />
+                  <%= link_to "go to task", performer_org_project_task_path(current_user.org, @project.id, item.id), class: 'nav-link' %>
+                </div>
+              </div>
+            <% end %>  
+        </div>
+      <% end %>
+    </div>
+    <br />
+
+<% end %>
+
+<br />
+
+<div class="col-10 offset-1 cnt-txt">
+  <%= link_to 'back to my projects', performer_org_path(current_user.org_id), class: 'btn btn-success' %>
+</div>
+

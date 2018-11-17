@@ -2,7 +2,12 @@
   <h1><%= @task.title %></h1>
   <br />
   <%= @task.description %><br />
-  <%= @task.status %><br /><br />
+  <%= @task.status %><br />
+  <% task_performer = User.where(:id => @task.user_id).first %>
+  <%= task_performer.email %><br /><br />
+  <%= @task.due_date %><br /><br />
 
   <h2>create a dependency task</h2>
+  <%= link_to 'back to project page', org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
+
 </div>

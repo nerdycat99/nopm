@@ -4,6 +4,17 @@ Rails.application.routes.draw do
   root 'splash#index'
   get 'test', to: 'splash#test'
 
+  resources :umakes
+
+  namespace :performer do
+    resources :orgs do
+      resources :users
+      resources :projects do
+        resources :tasks
+      end
+    end
+  end
+
   resources :orgs do
     resources :users
     resources :projects do

@@ -8,7 +8,7 @@ class RegistrationsController < Devise::RegistrationsController
   private
 
   def sign_up_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :org_id)  
+    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :org_id, :status)  
   end
 
 
@@ -19,8 +19,13 @@ class RegistrationsController < Devise::RegistrationsController
 
   def after_sign_in_path_for(users)
     org = current_user.org_id
-    org_path(org)
-    # test_path
+    if current_user.own?
+      org_path(org)
+    elsif current_user.mng?
+      org_path(org)
+    else
+      performer_org_path(org)
+    end
   end
 
 end

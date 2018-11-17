@@ -1,0 +1,35 @@
+<% user = User.where(:id => @task.user_id).first %>
+<h1>task performers show task page</h1>
+<br /><br />
+<div class="col12 offset-1">
+  <div class="row">
+    <div class="booyah-box col-6">
+        <h2><%= @task.title %></h2>
+        <br />
+        description: <%= @task.description %><br />
+        status: <%= @task.status %><br />
+        duration: <%= @task.duration %><br />
+        due date: <%= @task.due_date %><br />
+        assigned to: <%= user.email %><br /><br />
+
+        <% if @task.status == "NEW" %>
+          <%= link_to "accept task", edit_performer_org_project_task_path(current_user.org, @task.project_id, @task), class: 'btn btn-success' %>
+        <% else %>
+          <%= link_to "edit task", edit_performer_org_project_task_path(current_user.org, @task.project_id, @task), class: 'btn btn-success' %>
+        <% end %>
+
+    </div>
+
+    <div class="booyah-box col-4">
+      <h2>Dependencies</h2>
+      <br />
+      <%= link_to 'create new dependency', new_performer_org_project_task_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
+    </div>
+
+  </div>
+</div>
+<br />
+<div class = "cnt-txt">
+  <%= link_to 'back to project page', performer_org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
+</div>
+

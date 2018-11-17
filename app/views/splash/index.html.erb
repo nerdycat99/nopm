@@ -3,7 +3,15 @@
     <br /><h1 class="hero-text-title">endpoint</h1><br />
     <h2>distributed project coordination</h2>
     <h3>say goodbye to the project manager</h3><br /><br />
+
     <% if user_signed_in? %>
+      <% if current_user.own? %>
+        <% controller.redirect_to org_path(current_user.org_id) %>
+      <% elsif current_user.mng? %>
+        <% controller.redirect_to org_path(current_user.org_id) %>
+      <% else %>
+        <% controller.redirect_to performer_org_path(current_user.org_id) %>
+      <% end %>
       <%= link_to 'sign me out', destroy_user_session_path, method: :delete, class: 'btn btn-success' %>
     <% else %>
       <%= link_to 'sign me in', new_user_session_path, class: 'btn btn-success' %>

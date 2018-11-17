@@ -11,10 +11,14 @@ class OrgsController < ApplicationController
     @org = current_user
   end
 
+  def edit
+    
+  end
+
   def create
     @thisorg = Org.create(org_params)
     # redirect_to new_user_registration_path(:orgid => @thisorg)  
-    redirect_to new_user_registration_path, flash: {org_name: @thisorg.name, org_id: @thisorg.id}
+    redirect_to new_user_registration_path, flash: {org_name: @thisorg.name, org_id: @thisorg.id, user_type: 0}
 
   end
   

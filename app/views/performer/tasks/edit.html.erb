@@ -1,0 +1,26 @@
+<br />
+<div class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3">
+  
+  <% if @task.status == "NEW" %>
+    <h2>accept task</h2>
+  <% else %>
+    <h2>update task</h2>
+  <% end %>
+
+  <%= simple_form_for @task, url: performer_org_project_task_path do |f| %>
+    <%= f.input :description %>
+    <%= f.input :duration %>
+    <%= f.hidden_field :status, value: "ACP", autocomplete: "off" %> 
+    <% if @task.status == "NEW" %>
+      <%= f.submit "accept", class: 'btn btn-success' %>
+      <%= f.submit "reject", class: 'btn btn-success' %>
+      <%= f.submit "reassign", class: 'btn btn-success' %>
+      <%= f.submit "create dependency", class: 'btn btn-success' %>
+    <% else %>
+      <%= f.submit "update", class: 'btn btn-success' %>
+    <% end %>
+    <%= link_to 'back to project page', performer_org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
+  <% end %>
+  cancel will go back to show task
+  save will go back to project page
+</div>
