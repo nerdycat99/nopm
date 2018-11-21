@@ -8,8 +8,14 @@ class Performer::TasksController < ApplicationController
   end
 
   def create
+    parent_task = params[:task]["parent_task"]
     @project = Project.find(params[:project_id])
     @task = @project.tasks.create(task_params)
+
+    prerequisite = Prerequisite.create(:task_id => parent_task, :dependency_id => @task.id)
+    prerequisite.save
+ 
+
     redirect_to performer_org_project_path(current_user.org_id,@project)
   end
 
@@ -41,7 +47,7 @@ class Performer::TasksController < ApplicationController
     private
 
   def task_params
-    params.require(:task).permit(:title, :description, :status, :user_id, :due_date, :duration) 
+    params.require(:task).permit(:title, :description, :status, :user_id, :due_date, :duration, :deptasks) 
   end
 
 

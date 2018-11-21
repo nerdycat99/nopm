@@ -1,4 +1,4 @@
-<div class="signup-box">
+<div class="col10 offset-1">
   <h1><%= @project.name %></h1><br />
   <h2>summary</h2>
   <h3>id number: <%= @project.id %></h3>
@@ -6,11 +6,38 @@
   <h3>status: <%= @project.status %></h3>
   <br /><br /><br />
 
-  <h2>existing tasks for project</h2>
+  <h2>existing tasks for project</h2><br />
+  <% dep_map = [] %>
   <% @project.tasks.each do |task| %>
-    <%= link_to task.title, org_project_task_path(current_user.org, @project.id, task.id), class: 'nav-link' %>
+    <% if is_endpoint(task) %>
+      <%= dep_map = build_dependencies_from(task) %>
+    <% end %>
   <% end %>
+
+      
+      
+    <% if dep_map.count > 1 %> 
+      <% dep_display = arrange_dependencies_from(dep_map) %>
+      
+      <% 0.upto(dep_display.count-1) do |count| %>
+        <% dep_display.each do |tasky| %>
+
+          <% if tasky[1] == count %>
+              <%= link_title = "___________________" * count %>
+              <%= tasky %>
+              <br />
+          <% end %>
+
+          
+        <% end %>
+      <% end %>
+    <% end %>  
+
+  
   <br /><br />
+
+  <br /><br />
+  
 
   <%= link_to 'create new task', new_org_project_task_path(current_user.org_id,@project.id), class: 'btn btn-success' %>
   <%= link_to 'back to my projects', org_path(current_user.org_id), class: 'btn btn-success' %>
