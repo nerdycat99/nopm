@@ -2,6 +2,7 @@
   <h1><%= @task.title %></h1>
   <br />
   <%= @task.description %><br />
+  <%= @task.id %><br />
   <%= @task.status %><br />
   <% task_performer = User.where(:id => @task.user_id).first %>
   <%= task_performer.email %><br /><br />

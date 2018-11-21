@@ -4,7 +4,7 @@
 <div class="col12 offset-1">
   <div class="row">
     <div class="booyah-box col-6">
-        <h2><%= @task.title %></h2>
+        <h3><%= @task.title %></h3>
         <br />
         description: <%= @task.description %><br />
         status: <%= @task.status %><br />
@@ -21,13 +21,31 @@
     </div>
 
     <div class="booyah-box col-4">
-      <h2>Dependencies</h2>
+      <h3>Dependencies For This Task</h3>
       <br />
-      <%= link_to 'create new dependency', new_performer_org_project_task_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
+      <% @task.prerequisites.inspect %>
+      <% @task.dependencys.each do |dependency| %>
+      <%= link_to dependency.title, performer_org_project_task_path(current_user.org, @task.project_id, dependency.id), class: 'nav-link' %><br />
+      <% end %>
+      <br />
+      <%= link_to 'create new dependency', new_performer_org_project_task_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %>
     </div>
 
   </div>
 </div>
+
+  <br />
+  <% tasks_dependent_upon_task = Prerequisite.where(:dependency_id => @task.id) %>
+  <% if tasks_dependent_upon_task.count < 1 %>
+    <h3>This Task is the EndPoint</h3>
+  <% else %>
+    <h3>Tasks Dependent Upon This Task</h3>
+  <% end %>
+    
+    <% tasks_dependent_upon_task.each do |dependency| %>
+    <%= dependency.task.title %><br />
+    <% end %>
+
 <br />
 <div class = "cnt-txt">
   <%= link_to 'back to project page', performer_org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>

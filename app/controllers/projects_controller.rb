@@ -1,5 +1,7 @@
 class ProjectsController < ApplicationController
 
+  include ProjectsHelper
+
   def new
     # @project = Project.new
     @org = Org.find(params[:org_id])
