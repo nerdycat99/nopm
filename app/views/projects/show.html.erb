@@ -10,7 +10,7 @@
   <% dep_map = [] %>
   <% @project.tasks.each do |task| %>
     <% if is_endpoint(task) %>
-      <%= dep_map = build_dependencies_from(task) %>
+      <% dep_map = build_dependencies_from(task) %>
     <% end %>
   <% end %>
 
@@ -23,8 +23,9 @@
         <% dep_display.each do |tasky| %>
 
           <% if tasky[1] == count %>
-              <%= link_title = "___________________" * count %>
-              <%= tasky %>
+              <% link_title = "___________________" * count %>
+              <% link_title = link_title + tasky[0].title %>
+              <%= link_to link_title, org_project_task_path(current_user.org, @project.id, tasky[0].id), class: 'nav-link' %>
               <br />
           <% end %>
 

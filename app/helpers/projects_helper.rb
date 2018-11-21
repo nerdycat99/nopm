@@ -16,12 +16,12 @@ module ProjectsHelper
   def generate_dep_map(task, output, stack)
 
     if output.count < 1 
-      output << [nil,task.id]
+      output << [nil,task]
     end
     
     task.dependencys.each do |dependency|
       stack << dependency
-      output << [task.id,dependency.id]
+      output << [task,dependency]
     end
 
     if stack.count >= 1
