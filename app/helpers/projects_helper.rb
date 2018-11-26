@@ -40,12 +40,12 @@ module ProjectsHelper
     tasks_visited = {} 
     # reverse the order of the map of dependencies and pass in where we've been and where we need to go
     tasks_from_start = dep_map.reverse.each { |x| puts x }
-    arrange_rest_of_dependencies(tasks_visited, tasks_from_start)
+    arrange_dependencies(tasks_visited, tasks_from_start)
 
   end
 
 
-  def arrange_rest_of_dependencies(tasks_visited, remaining_tasks)
+  def arrange_dependencies(tasks_visited, remaining_tasks)
     
     if remaining_tasks.count <= 1
       return tasks_visited
@@ -74,9 +74,99 @@ module ProjectsHelper
         tasks_visited[next_set[0]] = tasks_visited[next_set[1]]+1
       end
     end
-    arrange_rest_of_dependencies(tasks_visited, remaining_tasks)
+    arrange_dependencies(tasks_visited, remaining_tasks)
 
   end
+
+
+
+  def get_unique_paths(dep_map)
+    all_paths = []
+    path = []
+    task_pairs = dep_map.reverse.each { |x| puts x }
+
+    unique_paths = get_all_unique_paths(all_paths, path, task_pairs)
+
+    final_task = unique_paths[0][-1]
+    vertical_order = []    
+    unique_paths.each do |path| 
+      path.pop # remove the last element which will be nil for each path
+      final_task = path.last
+      path.each_with_index do |task, index|
+        if !vertical_order.include?(task) && task != final_task
+          
+          # check whether the next task is in the vertical_order array, if so get the position at which it appears
+          if vertical_order.include?(path[index+1])
+            at_position = vertical_order.index(path[index+1])
+            vertical_order.insert(at_position, task)
+          else
+            vertical_order.push(task)
+          end
+        end  
+      end
+    end
+
+    vertical_order.push(final_task)
+    return vertical_order
+
+  end
+
+
+  def get_all_unique_paths(all_paths, path, task_pairs)
+
+    if all_paths.count < 1
+      path.push(task_pairs[0][1])
+      path.push(task_pairs[0][0]) 
+      task_pairs.shift 
+    else
+      all_paths.each do |individual_path|
+        individual_path.each do |task|
+          if task_pairs.count < 1
+            return all_paths 
+          end
+          if task_pairs[0][1] == task
+            # skip - the current position 1 task pair we've already been to in a previous path
+            # drop this pair of paths from task_pairs and go again
+            task_pairs.shift
+            get_all_unique_paths(all_paths, path, task_pairs)
+          else
+            # the current position 1 task is new, build a new path
+            path = []    
+            path.push(task_pairs[0][1])
+            path.push(task_pairs[0][0]) 
+          end
+        end
+      end
+    end
+
+    search_for = path.last
+
+    task_pairs.each do |task_pair|
+      if task_pair[1] == search_for
+        path.push(task_pair[0])
+        search_for = task_pair[0]
+      end
+    end
+
+    all_paths.push(path)
+
+    if task_pairs.count < 1
+      return all_paths
+    end
+
+    task_pairs.shift
+    path = []
+    get_all_unique_paths(all_paths, path, task_pairs)
+
+  end
+
+
+
+
+
+
+
+
 
 
 

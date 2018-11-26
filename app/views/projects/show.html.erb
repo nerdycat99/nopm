@@ -17,22 +17,19 @@
       
       
     <% if dep_map.count > 1 %> 
-      <% dep_display = arrange_dependencies_from(dep_map) %>
-      
-      <% 0.upto(dep_display.count-1) do |count| %>
-        <% dep_display.each do |tasky| %>
 
-          <% if tasky[1] == count %>
-              <% link_title = "___________________" * count %>
-              <% link_title = link_title + tasky[0].title %>
-              <%= link_to link_title, org_project_task_path(current_user.org, @project.id, tasky[0].id), class: 'nav-link' %>
-              <br />
-          <% end %>
+      <% horizontally_sorted = arrange_dependencies_from(dep_map) %> 
+      <% vertically_sorted = get_unique_paths(dep_map) %>
 
-          
-        <% end %>
+      <% vertically_sorted.each do |atask| %>
+        <% horizontal_position = horizontally_sorted.assoc atask %>
+        <% link_title = "___________________" * horizontal_position[1] %>
+        <% link_title = link_title + atask.id.to_s %>
+        <%= link_to link_title, org_project_task_path(current_user.org, @project.id, atask.id), class: 'nav-link' %>
       <% end %>
-    <% end %>  
+
+    <% end %>
+
 
   
   <br /><br />
