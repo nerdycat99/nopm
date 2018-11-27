@@ -7,10 +7,10 @@ Rails.application.routes.draw do
   resources :umakes
 
   namespace :performer do
-    resource :prerequisites
     resources :orgs do
       resources :users
       resources :projects do
+        resource :prerequisites
         resources :tasks
       end
     end

@@ -28,7 +28,11 @@
       <%= link_to dependency.title, performer_org_project_task_path(current_user.org, @task.project_id, dependency.id), class: 'nav-link' %><br />
       <% end %>
       <br />
-      <%= link_to 'create new dependency', new_performer_org_project_task_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %>
+      <%= link_to 'create a new task as dependency', new_performer_org_project_task_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %> 
+      <br /><br />
+      
+      <%= link_to 'select existing task as dependency', new_performer_org_project_prerequisites_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %> 
+
     </div>
 
   </div>
@@ -50,4 +54,16 @@
 <div class = "cnt-txt">
   <%= link_to 'back to project page', performer_org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
 

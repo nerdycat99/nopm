@@ -99,6 +99,9 @@ module ProjectsHelper
           if vertical_order.include?(path[index+1])
             at_position = vertical_order.index(path[index+1])
             vertical_order.insert(at_position, task)
+          elsif vertical_order.include?(path[index-1])
+            at_position = vertical_order.index(path[index-1])+1
+            vertical_order.insert(at_position, task)
           else
             vertical_order.push(task)
           end
@@ -120,20 +123,23 @@ module ProjectsHelper
       task_pairs.shift 
     else
       all_paths.each do |individual_path|
-        individual_path.each do |task|
+        individual_path.each_with_index do |task, index|
           if task_pairs.count < 1
             return all_paths 
           end
           if task_pairs[0][1] == task
-            # skip - the current position 1 task pair we've already been to in a previous path
-            # drop this pair of paths from task_pairs and go again
-            task_pairs.shift
-            get_all_unique_paths(all_paths, path, task_pairs)
+            if task_pairs[0][0] == individual_path[index+1]
+              # skip - the current position 1 task pair we've already been to in a previous path
+              # drop this pair of paths from task_pairs and go again
+              task_pairs.shift
+              get_all_unique_paths(all_paths, path, task_pairs)
+            end
           else
             # the current position 1 task is new, build a new path
             path = []    
             path.push(task_pairs[0][1])
             path.push(task_pairs[0][0]) 
+            # push
           end
         end
       end
@@ -154,7 +160,7 @@ module ProjectsHelper
       return all_paths
     end
 
-    task_pairs.shift
+  #  task_pairs.shift REMOVED 26/11
     path = []
     get_all_unique_paths(all_paths, path, task_pairs)
 

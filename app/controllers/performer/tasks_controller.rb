@@ -1,5 +1,6 @@
 class Performer::TasksController < ApplicationController
 
+  include Performer::TasksHelper
 
   def new
     @project = Project.find(params[:project_id])

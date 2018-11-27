@@ -1,0 +1,47 @@
+<div class="booyah-box col-10 offset-1">
+  <% parent_task = params[:parent_task] %>
+  <% all_tasks = Task.where(:project_id => @project.id) %>
+
+  <h1>select an existing task that this task will be dependent upon</h1>
+  <br /><br />
+  <h3>this task: <%= parent_task %></h3>
+    <%= simple_form_for @prerequisite, url: performer_org_project_prerequisites_path(@project) do |f| %>
+      
+      <select class="js-example-placeholder-single js-states form-control" id="selectTask">
+      <option></option>
+      <% @project.tasks.each do |task| %>
+        <option value="<%= task.id %>" data-favorite-color="<%= task.title %>"><%= task.title %></option>
+      <% end %>
+      </select>
+    <%= f.hidden_field :task_id, value: parent_task, autocomplete: "off" %>
+    <%= f.hidden_field :dependency_id, :id=>"dependency_id_field" %>
+
+    <br /><br />
+
+    <%= f.submit 'create dependency link', class: 'btn btn-success' %>
+  <% end %>
+</div>
+
+
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  $(".js-example-placeholder-single").select2({
+    placeholder: "select existing task as dependency for this task",
+    allowClear: true
+  });
+
+  // get the task selected
+  $( "select" )
+    .change(function() {
+    var str = "";
+    $( "select option:selected" ).each(function() {
+      var str = $('#selectTask option:selected').val();
+      $("#dependency_id_field").val(str);
+        alert(str);
+      });
+    });
+
+});
+    
+</script>

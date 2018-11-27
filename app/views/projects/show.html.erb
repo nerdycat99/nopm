@@ -6,15 +6,17 @@
   <h3>status: <%= @project.status %></h3>
   <br /><br /><br />
 
+  <% single_task = "" %>
   <h2>existing tasks for project</h2><br />
   <% dep_map = [] %>
   <% @project.tasks.each do |task| %>
     <% if is_endpoint(task) %>
       <% dep_map = build_dependencies_from(task) %>
+      <% single_task = task %>
     <% end %>
   <% end %>
 
-      
+     <% get_unique_paths(dep_map) %> 
       
     <% if dep_map.count > 1 %> 
 
@@ -28,6 +30,8 @@
         <%= link_to link_title, org_project_task_path(current_user.org, @project.id, atask.id), class: 'nav-link' %>
       <% end %>
 
+    <% else %>
+      <%= link_to single_task.id, org_project_task_path(current_user.org, @project.id, single_task.id), class: 'nav-link' %>
     <% end %>
 
 
