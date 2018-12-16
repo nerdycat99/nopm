@@ -1,0 +1,79 @@
+
+<div class="signup-box">
+  <h1 class="cnt-txt" id="fade1"></h1><br /> 
+  <h2 class="cnt-txt" id="fade2"></h2><br /> 
+  <h2 class="cnt-txt" id="fade3"></h2><br /><br />
+  <!-- Button trigger modal -->
+      <%= link_to 'continue', '#', data: {toggle: 'modal', target: '#regOrg'}, class: 'btn btn-success' %>
+</div>
+
+
+
+
+<!-- Modal For New Org Creation <h6 class="cnt-txt">if you'd like to join an existing space that someone has invited you to, please click here.</h6>-->
+<div class="modal fade" id="regOrg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      
+      <% @org = Org.new %>
+      <%= simple_form_for @org, url: orgs_path, remote: true do |f| %>
+        <% if @org.errors.any? %>
+          <% @org.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        <% end %>
+
+        <div class="modal-body cnt-txt">
+          <h3>create new organisation</h3><br />
+          <h5>enter a name below and we'll set up a space for your organisation or company</h5>
+          <br /><br />
+                  
+            <%= f.input :name, validate: true, label: false, placeholder: "organisation name", input_html: { id: "orgname" } %>
+            <br />
+            <%= f.submit 'continue', class: 'btn btn-success', id: 'btnCreate' %>
+            <br /><br />
+            
+        </div>
+        <div class="modal-footer">
+          
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+
+  $(function() {
+    console.log("Hello, JavaScript");
+  });
+
+  $("#btnCreate").on('click', function(){
+    var orgName = document.getElementById('orgname').value
+
+    if( orgName == "" ) {
+      alert("you'll need to enter the name of your organisation or company to continue")
+      return false;
+    } else {
+      return true;
+    }
+  });
+
+
+</script>
+<script>
+  $(document).on('turbolinks:load', function() {
+    var populateText = function() {
+        $('#fade1').empty().append($('<div>okay let\'s get you set up...</div>').hide().fadeIn(2000));
+        $('#fade2').empty().append($('<div>first we\'ll create a space for your company or organisation</div>').hide().fadeIn(2000));
+        $('#fade3').empty().append($('<div>click continue to get started</div>').hide().fadeIn(2000));
+    };
+    $(populateText);
+  });
+</script>

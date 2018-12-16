@@ -15,7 +15,7 @@
       <%= link_to 'sign me out', destroy_user_session_path, method: :delete, class: 'btn btn-success' %>
     <% else %>
       <%= link_to 'sign me in', new_user_session_path, class: 'btn btn-success' %>
-      <%= link_to 'get started', new_org_path, class: 'btn btn-success' %>
+      <%= link_to 'get started', register_space_path, class: 'btn btn-success' %>
       <%= link_to 'find out more', new_org_path, class: 'btn btn-success' %>
     <% end %>
     <br /><br />

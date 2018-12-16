@@ -1,5 +1,5 @@
 <div class="booyah-box col-10 offset-1">
-  <% parent_task = params[:parent_task] %>
+  <%= parent_task = params[:parent_task] %>
   <% all_tasks = Task.where(:project_id => @project.id) %>
 
   <h1>select an existing task that this task will be dependent upon</h1>
@@ -7,9 +7,19 @@
   <h3>this task: <%= parent_task %></h3>
     <%= simple_form_for @prerequisite, url: performer_org_project_prerequisites_path(@project) do |f| %>
       
+    <% dep_map = [] %>
+      <% @project.tasks.each do |task| %>
+        <% if is_endpoint(task) %>
+          <% dep_map = build_dependencies_from(task) %>
+        <% end %>
+      <% end %>
+      <% all_task_paths = get_unique_paths(dep_map, true) %>
+      <% tasks_available_for_selection = calculate_valid_dependecies_for_task(all_task_paths, parent_task) %>
+
+
       <select class="js-example-placeholder-single js-states form-control" id="selectTask">
       <option></option>
-      <% @project.tasks.each do |task| %>
+      <% tasks_available_for_selection.each do |task| %>
         <option value="<%= task.id %>" data-favorite-color="<%= task.title %>"><%= task.title %></option>
       <% end %>
       </select>

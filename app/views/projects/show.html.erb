@@ -16,12 +16,12 @@
     <% end %>
   <% end %>
 
-     <% get_unique_paths(dep_map) %> 
+     <% get_unique_paths(dep_map, false) %> 
       
     <% if dep_map.count > 1 %> 
 
       <% horizontally_sorted = arrange_dependencies_from(dep_map) %> 
-      <% vertically_sorted = get_unique_paths(dep_map) %>
+      <% vertically_sorted = get_unique_paths(dep_map, false) %>
 
       <% vertically_sorted.each do |atask| %>
         <% horizontal_position = horizontally_sorted.assoc atask %>

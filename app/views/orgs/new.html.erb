@@ -1,5 +1,8 @@
 <div class="signup-box">
-  <h1 class="cnt-txt">okay let's create your network</h1><br /> 
+  <h1 class="cnt-txt">okay let's get you set up...</h1><br /> 
+  <h2 class="cnt-txt">first we'll create a space for your company or organisation.</h2><br /> 
+  <h2 class="cnt-txt">click continue to get started.</h2><br /><br />
+  <%= link_to "edit task", edit_performer_org_project_task_path(current_user.org, @task.project_id, @task), class: 'btn btn-success' %>
   <h2 class="cnt-txt">this can be the name of your organisation for example. </h2>
   <h2 class="cnt-txt">once set up you can invite other people to participate in activities associated with this network.</h2><br />
   <%= simple_form_for @org do |f| %>
