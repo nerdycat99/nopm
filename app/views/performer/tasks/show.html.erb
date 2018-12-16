@@ -31,7 +31,9 @@
       <%= link_to 'create a new task as dependency', new_performer_org_project_task_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %> 
       <br /><br />
       
-      <%= link_to 'select existing task as dependency', new_performer_org_project_prerequisites_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %> 
+      <%= link_to 'select existing task as dependency', new_performer_org_project_prerequisites_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %>
+      <!-- Button trigger modal -->
+      <%= link_to 'select existing task as dependency2', '#', data: {toggle: 'modal', target: '#myModal'}, class: 'btn btn-success' %>
 
     </div>
 
@@ -54,6 +56,89 @@
 <div class = "cnt-txt">
   <%= link_to 'back to project page', performer_org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
 </div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">select task as dependency</h4>
+      </div>
+      <div class="modal-body">
+        
+
+          <% all_tasks = Task.where(:project_id => @task.project_id) %>
+
+          <h5>Do you need someone to do something before you can start working on your task?</h5><br />
+          <h6>You can select an existing task that your task will be dependent upon below. Otherwise you can create a new task that has to happen before you can start your task.</h6>
+          <br /><br />
+            <%= simple_form_for Prerequisite.new, url: performer_org_project_prerequisites_path(@task.project) do |f| %>
+              
+            <% dep_map = [] %>
+              <% all_tasks.each do |task| %>
+                <% if is_endpoint(task) %>
+                  <% dep_map = build_dependencies_from(task) %>
+                <% end %>
+              <% end %>
+              <% all_task_paths = get_unique_paths(dep_map, true) %>
+              <% tasks_available_for_selection = calculate_valid_dependecies_for_task(all_task_paths, @task.id) %>
+
+              <select class="js-example-placeholder-single js-states form-control" id="selectTask">
+              <option></option>
+              <% tasks_available_for_selection.each do |task| %>
+                <option value="<%= task.id %>" data-favorite-color="<%= task.title %>"><%= task.title %></option>
+              <% end %>
+              </select>
+
+            <%= f.hidden_field :task_id, value: @task.id, autocomplete: "off" %>
+            <%= f.hidden_field :dependency_id, :id=>"dependency_id_field" %>
+
+            <br /><br />
+
+            <%= f.submit 'create dependency link', class: 'btn btn-success' %>
+            <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+          <% end %>
+
+
+      </div>
+      <div class="modal-footer">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script type='text/javascript'>
+
+$(document).ready(function() {
+  $(".js-example-placeholder-single").select2({
+    placeholder: "select existing task as dependency for this task",
+    allowClear: true
+  });
+
+  // get the task selected
+  $( "select" )
+    .change(function() {
+    var str = "";
+    $( "select option:selected" ).each(function() {
+      var str = $('#selectTask option:selected').val();
+      $("#dependency_id_field").val(str);
+        alert(str);
+      });
+    });
+
+});
+    
+</script>
 
 
 

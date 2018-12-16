@@ -1,5 +1,7 @@
 class Performer::PrerequisitesController < ApplicationController
 
+  include ProjectsHelper
+
   def new
     @project = Project.find(params[:project_id])
     @prerequisite = Prerequisite.new

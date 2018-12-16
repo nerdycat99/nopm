@@ -80,12 +80,17 @@ module ProjectsHelper
 
 
 
-  def get_unique_paths(dep_map)
+
+  def get_unique_paths(dep_map, return_valid_dep)
     all_paths = []
     path = []
     task_pairs = dep_map.reverse.each { |x| puts x }
 
     unique_paths = get_all_unique_paths(all_paths, path, task_pairs)
+
+    if return_valid_dep 
+      return unique_paths
+    end 
 
     final_task = unique_paths[0][-1]
     vertical_order = []    
@@ -111,7 +116,6 @@ module ProjectsHelper
 
     vertical_order.push(final_task)
     return vertical_order
-
   end
 
 
@@ -164,6 +168,43 @@ module ProjectsHelper
     path = []
     get_all_unique_paths(all_paths, path, task_pairs)
 
+  end
+
+
+
+  def calculate_valid_dependecies_for_task(all_paths, target_task)
+
+    valid_deps = []
+    invalid_deps =[]
+    holding_array = []
+
+    # remove any array in which the target_task appears, these are the paths up/down where the target_task
+    # is either a dependecy for a task or is dependent on a task
+    all_paths.each_with_index do |path, index|
+      path.pop # get rid of the nil at the end of each path
+      path.each do |task|
+        if task.id == target_task.to_i
+          holding_array = invalid_deps + path
+          invalid_deps = holding_array
+          holding_array = []
+          all_paths.delete_at(index)
+        end
+      end
+    end
+
+    # from all remaining arrays (paths) remove any item that exists in invalid_deps from each array
+    # and return the remaining tasks in the form of unique array valid_tasks
+    all_paths.each do |path|
+      path.pop
+      path.each_with_index do |task, index|
+        if !invalid_deps.include?(task) && !valid_deps.include?(task)
+          valid_deps << task
+        end
+      end
+    end
+
+
+    return valid_deps
   end
 
 

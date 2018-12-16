@@ -1,7 +1,8 @@
 
-<%= org_name = flash[:org_name] %>
-<%= org_id = flash[:org_id] %>
-<%= user_type = flash[:user_type] %>
+
+<% the_org = params[:org] %>
+<% @org = Org.where(:id => params[:org]).first %>
+<% user_type = params[:user].to_i %>
 <% if user_type == 0 %>
   <% status = "own" %>
 <% elsif user_type == 1 %>
@@ -11,13 +12,13 @@
 <% end %>
 
 <div class="signup-box">
-  <h1 class="cnt-txt">now let's create an account for you</h1><br /> 
   <div class="cnt-txt">
-    <h2>we'll make sure you're the owner of <%= org_name %> too.</h2><br />
+    <h1>fantastic, we've set up a space for <%= @org.name %></h1><br /><br />
   </div>
+  <h2 class="cnt-txt">now let's create your account, just fill in a few details below and we're all done.</h2><br /><br />  
 
 
-  <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+  <%= form_for(resource, as: registration_path, url: registration_path) do |f| %>
   <%= devise_error_messages! %>
     <div class="field cnt-txt">
       <%= f.text_field :first_name, autofocus: true, autocomplete: "off", placeholder: "first name" %>
@@ -32,29 +33,21 @@
     </div><br />
 
     <div class="field">
-      <%= f.hidden_field :org_id, value: org_id, autocomplete: "off" %>
+      <%= f.hidden_field :org_id, value: @org.id, autocomplete: "off" %>
       <%= f.hidden_field :status, value: status, autocomplete: "off" %>
     </div>
     <br />
 
     <div class="field">
-      <%= f.label :password %>
-      <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em>
-      <% end %><br />
-      <%= f.password_field :password, autocomplete: "off" %>
-    </div>
-
-    <div class="field">
-      <%= f.label :password_confirmation %><br />
-      <%= f.password_field :password_confirmation, autocomplete: "off" %>
+      <%= f.password_field :password, autocomplete: "off", placeholder: "enter password" %><br /><br />
+      <%= f.password_field :password_confirmation, autocomplete: "off", placeholder: "confirm password" %>
     </div>
 
     <br /><br />
 
     <div class="actions">
-      <%= f.submit 'continue', class: 'btn btn-success' %>
-      <br /><br />
+      <%= f.submit 'finish', class: 'btn btn-success' %>
+      <%= f.submit 'cancel', class: 'btn btn-success' %>
     </div>
   <% end %>
 </div>

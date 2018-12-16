@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   root 'splash#index'
   get 'test', to: 'splash#test'
+  get 'register-space', to: 'splash#register_space'
+  get 'register-user', to: 'splash#register_user'
 
   resources :umakes
 
