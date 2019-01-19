@@ -13,6 +13,8 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require pickadate/picker
+//= require pickadate/picker.date
 //= require popper
 //= require tether
 //= require bootstrap-sprockets

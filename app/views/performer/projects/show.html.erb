@@ -1,11 +1,11 @@
 
 <div class="booyah-box col-10 offset-1">
-  <h1>task performer projects page </h1>
+  <h2>task performer projects page </h2>
   <br /><br />
-  <h3>project name: <%= @project.name %></h3>
-  <h3>id number: <%= @project.id %></h3>
-  <h3>description: <%= @project.description %></h3>
-  <h3>status: <%= @project.status %></h3>
+  <h4>project name: <%= @project.name %></h4>
+  <h4>id number: <%= @project.id %></h4>
+  <h4>description: <%= @project.description %></h4>
+  <h4>status: <%= @project.status %></h4>
   <br />
 </div>
 <br />
@@ -38,15 +38,16 @@
   <% end %>
 
     <div class="booyah-box col-10 offset-1">
-      <h3><%= title %></h3>
+      <h4><%= title %></h4>
       <% @the_tasks.in_groups_of(3, false).each do |group| %>
         <div class="row">
             <% group.each do |item| %>
               <div class="item col-4">
                 <div class="card">
-                  <h6><%= item.title %></h6> <br />
-                  <%= item.description %> <br />
-                  <%= link_to "go to task", performer_org_project_task_path(current_user.org, @project.id, item.id), class: 'nav-link' %>
+                  <h6><%= link_to item.title, performer_org_project_task_path(current_user.org, @project.id, item.id), class: 'nav-link' %>
+                  <h6><%= item.description %></h6>
+                  <h6>start:  <%= calculate_task_start_date(item.due_date,item.duration, true) %> - end:  <%= format_date_as_string_from(item.due_date) %></h6>
+                  <h6>duration: <%= convert_to_string_from(item.duration) %></h6>
                 </div>
               </div>
             <% end %>  

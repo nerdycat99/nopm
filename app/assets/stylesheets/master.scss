@@ -1,4 +1,6 @@
 @import "bootstrap";
+@import "pickadate/default";
+@import "pickadate/default.date"; 
 
 body, html {
     height: 100%;
@@ -6,13 +8,15 @@ body, html {
 
 .simple_form input{
     float: none;
-    text-align : center;
+    text-align : left;
 }
 
-.js-example-placeholder-single {
-  float: left;
-  width: 400px;
+.newprojectadduser {
+  width:100%;
 }
+
+
+
 
 .bg { 
     /* The image used */

@@ -1,17 +1,22 @@
 class ProjectsController < ApplicationController
 
+  skip_before_action :verify_authenticity_token
+
   include ProjectsHelper
 
   def new
     # @project = Project.new
-    @org = Org.find(params[:org_id])
+    # @org = Org.find(params[:org_id])
     @project = Project.new 
+    # @project.tasks.build
   end
 
   def create
     @org = Org.find(params[:org_id])
+    # @org = current_user.org_id
     @project = @org.projects.create(project_params)
-    redirect_to org_path(@org)
+    render json: @project
+    # redirect_to org_path(@org)
   end
 
   def show
@@ -21,12 +26,14 @@ class ProjectsController < ApplicationController
 
   def edit
     @project = Project.find(params[:id])
+    @project_end_date
+    @endpoint_task
   end
 
   private
 
   def project_params
-    params.require(:project).permit(:name, :description, :status) 
+    @new_project = params.require(:project).permit(:name, :description, :status)
   end
 
 end

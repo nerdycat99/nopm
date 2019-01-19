@@ -13,7 +13,8 @@ class UmakesController < ApplicationController
       User.create(nu_params)
       # flash[:notice] = source
       if source == "org-page"
-        redirect_to org_path(current_user.org_id)
+        # redirect_to org_path(current_user.org_id)
+
       else
         redirect_to new_org_project_task_path(current_user.org_id,projref)
       end

@@ -5,11 +5,10 @@
     <%= simple_form_for @task, url: performer_org_project_tasks_path(@project) do |f| %>
     <%= f.input :title %>
     <%= f.input :description %>
-    Date Due<br /> 
-    <%= f.date_select :due_date %>
+    
     <%= f.hidden_field :user_id, :id=>"user_id_field" %>
     <%= f.hidden_field :status, value: "NEW", autocomplete: "off" %>
-    
+    <%= f.hidden_field :due_date, value: calculate_new_task_due_date_from(parent_task), autocomplete: "off" %>
     <%= f.hidden_field :parent_task, value: parent_task, autocomplete: "off" %>
 
     

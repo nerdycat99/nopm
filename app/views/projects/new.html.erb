@@ -1,15 +1,81 @@
 
 <div class="booyah-box col-10 offset-1">
   <h1>create new project</h1>
-    <%= @org.name %>
-      <%= simple_form_for @project, url: org_projects_path(@org) do |f| %>
-      <%= f.input :name %>
-      <%= f.input :description %>
-      <%= f.input :status %>
-    <br />
-      <%= f.submit 'Create', class: 'btn btn-primary' %>
-    <% end %>
+	<%= @org.name %>
+
+    <%= simple_form_for @project, url: org_projects_path(@org) do |f| %>
+      <h3>create new project</h3><br />
+      <h5>step one: enter a name and description for the project</h5>
+      <br /><br />
+        
+      <%= f.input :name, validate: true, label: false, placeholder: "name of the project", input_html: { id: "projectname" } %>
+      <%= f.input :description, validate: true, label: false, placeholder: "description of the project", input_html: { id: "projectdesc" } %>
+      <%= f.hidden_field :status, value: "NEW", autocomplete: "off" %> 
+
+      <%= f.simple_fields_for :tasks do |t| %>
+        <%= t.input :title, validate: true, label: false, placeholder: "task name", input_html: { id: "taskname" } %>
+        <%= t.input :description, validate: true, label: false, placeholder: "task description", input_html: { id: "taskdesc" } %>
+      <% end %>
+    
+      <br />
+      <%= f.submit 'OLDcontinue', class: 'btn btn-success', id: 'btnCreateNewProject' %>
+      <br /><br />
+		<% end %>
+
 
 </div>
-
+<%= link_to 'continue', class: 'btn btn-success' %>
 <br />
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<script>
+
+	 $("#btnCreateNewProject").on('click', function(){
+
+    let projectName = document.getElementById('projectname').value;
+    let projectDescription = document.getElementById('projectdesc').value;
+    let taskName = document.getElementById('taskname').value;
+    let taskDescription = document.getElementById('taskdesc').value;
+    let orgId = <%= @org.id %>;
+    let user = <%= current_user.id %>
+
+    if ( projectName == "" || projectDescription == "") {
+      alert("please give your project a name and short description to continue");
+      return false;
+    } else {
+    	// construct path and the payload for creating a new project
+    	let newProjectPath = "/orgs/" + orgId + "/projects";
+    	var newProject = {
+	      project: {
+	        name: projectName,
+	        description: projectDescription
+	      }
+    	};
+
+    	// post new project 
+	    $.post(newProjectPath, newProject).success(function(data) {
+				// on success now create the associated task!!
+	    	let projectId = data.id
+	    	let newTaskPath = "/orgs/" + orgId + "/projects/" + projectId + "/tasks";
+
+	    	// construct the payload for creating a new task
+	    	var newTask = {
+		      task: {
+						title: taskName,
+						description: taskDescription, 
+						status: "NEW",
+						user_id: user
+		      }
+    		};
+	    	$.post(newTaskPath, newTask).success(function(data) {
+	    		// in here everything was successful!!!
+	    	});
+
+      }); 
+
+      return false;
+    }
+  });
+</script>

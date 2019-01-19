@@ -1,14 +1,15 @@
 class RegistrationsController < Devise::RegistrationsController
 
   # def create
-    # @thisuser = User.create(sign_up_params)
-    # redirect_to org_path(@thisuser.org_id)
-  # end
+  #   @thisuser = User.create(sign_up_params)
+  #   redirect_to org_path(@thisuser.org_id)
+  #  end
 
   private
 
   def sign_up_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :org_id, :status)  
+    @thisuser = params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :org_id, :status)  
+
   end
 
 

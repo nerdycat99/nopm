@@ -24,7 +24,7 @@
         </button>
       </div>
       <div class="modal-body cnt-txt">
-        <h3>create new user</h3><br /><br />
+        <h3>create new user</h3><br />
         <h5>enter your details below, we'll set</h5>
         <h5>you up as the owner for <%= org.name %>.</h5>
         <br />
@@ -32,15 +32,15 @@
           <%= simple_form_for(resource, as: resource_name, url:registration_path(resource_name)) do |f| %>
           <%= f.error_notification %>
             <div class="field cnt-txt">
-              <%= f.input :first_name, autofocus: true, autocomplete: "off", placeholder: "Sam", input_html: { id: "firstname" } %>
+              <%= f.input :first_name, autofocus: true, autocomplete: "off", placeholder: "enter first name", label: false, input_html: { id: "firstname" } %>
             </div>
 
             <div class="field">
-              <%= f.input :last_name, autofocus: true, autocomplete: "off", placeholder: "Smith" %>
+              <%= f.input :last_name, autofocus: true, autocomplete: "off", placeholder: "enter last name",label: false, input_html: { id: "lastname" } %>
             </div>
 
             <div class="field">
-              <%= f.input :email, autofocus: true, autocomplete: "email", placeholder: "sam.smith@company.com" %>
+              <%= f.input :email, autofocus: true, autocomplete: "email", placeholder: "enter email address", label: false, input_html: { id: "email" } %>
             </div><br />
 
             <div class="field">
@@ -49,11 +49,9 @@
             </div>
             <br />
             <div class="field">
-              <%= f.input :password, autocomplete: "off", placeholder: "******" %>
-              <%= f.input :password_confirmation, autocomplete: "off", placeholder: "******" %>
+              <%= f.input :password, autocomplete: "off", placeholder: "enter password", label: false, input_html: { id: "password1" } %>
+              <%= f.input :password_confirmation, autocomplete: "off", placeholder: "confirm password", label: false, input_html: { id: "password2" } %>
             </div>
-
-            <br /><br />
 
             <div class="actions">
               <%= f.submit 'continue', class: 'btn btn-success', id: 'btnCreateUser' %>
@@ -75,13 +73,28 @@
 <script>
 
   $("#btnCreateUser").on('click', function(){
-    var firstName = document.getElementById('firstname').value
+    let firstName = document.getElementById('firstname').value
+    let lastName = document.getElementById('lastname').value
+    let email = document.getElementById('email').value
+    let passwordOne = document.getElementById('password1').value
+    let passwordTwo = document.getElementById('password2').value
+    let validEmailChar = "^[-0-9A-Za-z!#$%&'*+/=?^_`{|}~.]+@[-0-9A-Za-z!#$%&'*+/=?^_`{|}~.]+";
 
-    if( firstName == "" ) {
-      alert("you'll need to enter your first name to create an account")
+    if( firstName == "" || lastName == "" || email == "" || passwordOne == "" || passwordTwo == "" ) {
+      alert("please ensure you have completed all the fields before continuing")
       return false;
     } else {
-      return true;
+      if ( passwordOne != passwordTwo ) {
+        alert("passwords do not match")
+        return false;
+      } else {
+        if ( !email.match(validEmailChar) ) {
+          alert("please enter a valid email address to continue")
+          return false;
+        } else {
+          return true;
+        }
+      }
     }
   });
 

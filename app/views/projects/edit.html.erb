@@ -1,2 +1,104 @@
-<h1>edit a project</h1>
-<%= @project.inspect %>
+<h3>edit a project</h3>
+
+<% @project.tasks.each do | task | %>
+	<% if is_endpoint(task) %>
+		<% @project_end_date = task.due_date %>
+		<% @endpoint_task = task %>
+	<% end %>
+<% end %>
+
+
+current project end date: <%= format_date_as_string_from(@project_end_date) %>
+
+<%= simple_form_for @project, url: org_project_path(current_user.org_id, @project.id) do |f| %>
+	<br /><br />
+	  
+	<%= f.input :name, validate: true, label: false, input_html: { id: "projectname" } %>
+	<%= f.input :description, validate: true, label: false, input_html: { id: "projectdesc" } %>
+	<%= f.hidden_field :status, autocomplete: "off" %> 
+
+	<br />
+		<div class="cnt-txt">
+		  <%= link_to 'back to projects', new_umake_path(:source => "task-page", :projref => @project.id), class: 'btn btn-success' %>
+		  <%= link_to 'change end date', '#', data: {toggle: 'modal', target: '#adjust_project_enddate'}, class: 'btn btn-success', id: 'btnAdjustProjectEndDate' %>
+	  </div>
+	<br /><br />
+<% end %>
+
+
+
+
+
+
+<!-- Modal for adjusting end date of project / ergo due date of endpoint task-->
+<div class="modal fade" id="adjust_project_enddate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseAddUser'>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cnt-txt">
+          <h3>change project end date</h3><br />
+        </div>
+
+        <%= form_for @endpoint_task, url: org_project_task_path(current_user.org_id, @project.id, @endpoint_task.id) do |f| %>
+        
+	        <div class="row">
+	          <div class="col-10 offset-1">
+							<h7>the project is due to complete on <%= @project_end_date %></h7>
+							<h7>please use the control below to adjust</h7><br /><br />
+
+		          <%= text_field_tag(:date, value = @project_end_date.strftime('%e %B, %Y'), html_options = {class: 'form-control datepicker', placeholder: 'mm/dd/yyyy' }) %>
+		          <script type="text/javascript">
+		            $('.datepicker').pickadate();
+		          </script>
+		          <%= f.hidden_field :due_date, id: "task_end_date", autocomplete: "off" %>
+		          <br /><br /><br /><br />
+		          
+	          </div>
+						
+	        </div>
+
+	        <div class="cnt-txt">
+	          <div class="actions">
+	          	<%= f.submit "update", class: 'btn btn-success', id: 'btnUpdateProjectEndDate' %>
+	            <br />
+	          </div>
+	        </div>
+
+        <% end %>
+
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+<script type="text/javascript">
+
+
+	
+	$(document).on('turbolinks:load', function() {
+
+		// intercept the button click to reset due date, assign selected date to hidden_value
+		$("#btnUpdateProjectEndDate").on('click', function(){
+				var newEndDate = document.getElementById('date').value;
+				document.getElementById("task_end_date").value = newEndDate;
+	      return true
+		});
+
+
+	});
+
+</script>
+
+
+
+

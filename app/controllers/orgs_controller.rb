@@ -1,6 +1,9 @@
 class OrgsController < ApplicationController
 
+  include OrgsHelper
+
   def index
+    render json: User.where(:org_id => current_user.org_id)
   end
 
   def new
@@ -8,11 +11,12 @@ class OrgsController < ApplicationController
   end
 
   def show
-    @org = current_user
+    # changed to be the current_user's org id
+    @org = current_user.org_id
+    @users = User.where(:org_id => current_user.org_id)
   end
 
   def edit
-    
   end
 
   def create
