@@ -9,6 +9,7 @@ class User < ApplicationRecord
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP } 
 
   belongs_to :org
+  has_many :notifications, foreign_key: :recipient_id
 end
 
 

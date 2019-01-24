@@ -25,6 +25,23 @@
     </ul>
     <ul class="navbar-nav">
       <% if user_signed_in? %>
+        <li class="nav-item dropdown data-behavior="notifications">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" data-behavior="notifications-link" id="dropdownMenu1" aria-haspopup="true" aria-expanded="false"><%= fa_icon "bell" %> <span class="unread-count"></span></a>
+          <div class="dropdown-menu dropdown-menu-right aria-labelledby="dropdownMenu1" data-behavior="notification-items">
+            <div class="notification-listing" id ="notification-links">
+
+            <!--
+            <a class="dropdown-item" href="#">The start date for one of your tasks has moved</a>
+            <a class="dropdown-item" href="#">One of your tasks is overdue</a>
+            <a class="dropdown-item" href="#">A dependency for one of your tasks has completed</a>
+            <a class="dropdown-item" href="#">A dependency for one of your tasks is running late</a>
+            <a class="dropdown-item" href="#">The end date for project X has been changed</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Separated link</a>
+            -->
+            </div>
+          </div>
+        </li>
         <li class="nav-item">
          <%= link_to 'Sign out', destroy_user_session_path, method: :delete, class: 'nav-link' %>
         </li>
@@ -42,14 +59,14 @@
 
 
 
-          <div class="container">
-            <% if flash[:error].present? %>
-              <div class="col-10 offset-1 alert alert-danger">
-                <%= flash[:error].html_safe %>
-              </div>
-            <% end %>
-          </div>
-
+<div class="container">
+  <% if flash[:error].present? %>
+    <div class="col-10 offset-1 alert alert-danger">
+      <%= flash[:error].html_safe %>
+    </div>
+  <% end %>
+</div>
+ 
 
 
 
@@ -57,3 +74,105 @@
     <%= yield %>
   </body>
 </html>
+
+
+
+<script type="text/javascript">
+
+$(function() {
+
+  //generate the current date
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth() + 1; //January is 0!
+  var yyyy = today.getFullYear();
+
+  if (dd < 10) {
+    dd = '0' + dd;
+  }
+
+  if (mm < 10) {
+    mm = '0' + mm;
+  }
+
+  today = mm + '/' + dd + '/' + yyyy;
+  
+  // get the json format notifications for current user - from view/notifications/index
+  $.get("/notifications.json").success( function( data ) {
+
+    // for each notification in data array build thge notification into html text
+    var htmlString = "";
+
+    $.each(data, function(index, notification) {
+      htmlElement = '<a class="dropdown-item" id= "' + notification.id + '" href="' + notification.url + '">' + notification.action + '</a>'
+      htmlString += htmlElement;
+    });
+
+    // get DOM reference to notifications and count flag and set their HTML/text
+    var notificationList = $('.notification-listing');
+    var notificationCount = $('.unread-count');
+    notificationList.html(htmlString);
+    notificationCount.text(data.length)
+
+    // get reference to each of the <a> tags which the above inserts
+    var notificationLinks = document.getElementById('notification-links');
+    var notificationLinkItems = notificationLinks.getElementsByTagName('a');
+
+    // map through and for each build on click method that passes notification id to
+    // notification post url - enables us to mark each notification clicked as read
+    $.each(notificationLinkItems, function(index, notification) {
+
+      notificationLinkItems[index].onclick = function (e) {
+        let notificationId = e.path[0].id
+        // console.log(notificationId)
+
+        $.post("/notifications/" + notificationId, {
+          _method: "PUT",
+          notification: {
+            read_at: today // NB: not used, we just use notificationID to find notification and set in notification controller update method to today's date
+          }
+        });
+      }
+
+    });
+
+    
+
+
+
+
+  });
+
+
+
+});
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

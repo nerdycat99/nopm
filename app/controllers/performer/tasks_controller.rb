@@ -14,9 +14,15 @@ class Performer::TasksController < ApplicationController
     @project = Project.find(params[:project_id])
     @task = @project.tasks.create(task_params)
 
+    # on success create a pre-requisite that attaches new task to its parent
     prerequisite = Prerequisite.create(:task_id => parent_task, :dependency_id => @task.id)
     prerequisite.save
- 
+
+    # and generate a notification to the new tasks performer
+    recipient = User.where(:id => @task.user_id).first
+    message = "new task has been assigned to you"
+    notification = Notification.create(:recipient => recipient, :actor => current_user, :action => message, :notifiable => @task)
+    notification.save
     redirect_to performer_org_project_path(current_user.org_id,@project)
   end
 
