@@ -1,6 +1,7 @@
 @import "bootstrap";
 @import "pickadate/default";
 @import "pickadate/default.date"; 
+@import "font-awesome";
 
 body, html {
     height: 100%;
@@ -14,8 +15,6 @@ body, html {
 .newprojectadduser {
   width:100%;
 }
-
-
 
 
 .bg { 
@@ -108,3 +107,22 @@ h1, h2, h3, h4, h5, h6, .navbar {
 .btn {
   border-radius: 0;
 }
+
+
+li.dropdown:last-child .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+.unread-count {
+  color: red;
+}
+
+
+
+
+
+
+
+
+

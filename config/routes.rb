@@ -18,6 +18,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :notifications do
+    collection do
+      post :mark_as_read
+    end
+  end
+
   resources :orgs do
     resources :users
     resources :projects do
