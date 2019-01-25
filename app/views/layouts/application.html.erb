@@ -26,7 +26,13 @@
     <ul class="navbar-nav">
       <% if user_signed_in? %>
         <li class="nav-item dropdown data-behavior="notifications">
-          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" data-behavior="notifications-link" id="dropdownMenu1" aria-haspopup="true" aria-expanded="false"><%= fa_icon "bell" %> <span class="unread-count"></span></a>
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" data-behavior="notifications-link" id="dropdownMenu1" aria-haspopup="true" aria-expanded="false"><%= fa_icon "bell" %>
+            <% any_notifications = Notification.where(:recipient_id => current_user.id) %>
+            <% any_unread_notifications = any_notifications.where(:read_at => nil) %>
+            <% if any_unread_notifications.count >= 1 %>
+              <span class="badge"></span>
+            <% end %>
+          </a>
           <div class="dropdown-menu dropdown-menu-right aria-labelledby="dropdownMenu1" data-behavior="notification-items">
             <div class="notification-listing" id ="notification-links">
 
@@ -110,7 +116,7 @@ $(function() {
 
     // get DOM reference to notifications and count flag and set their HTML/text
     var notificationList = $('.notification-listing');
-    var notificationCount = $('.unread-count');
+    var notificationCount = $('.badge');
     notificationList.html(htmlString);
     notificationCount.text(data.length)
 
