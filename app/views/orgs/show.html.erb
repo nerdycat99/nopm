@@ -105,7 +105,7 @@
             <!-- project description -->
             <%= f.input :description, validate: true, label: "... do you want to give it a description?", placeholder: "enter optional description", input_html: { id: "projectdesc" } %>
 
-            <!-- These fields we are misusing, since we are using AJAX to submit-->
+            <!-- status field we are misusing, since we are using AJAX to submit-->
             <!-- field_for not working in modal, hence misuse of parent fields -->
             <%= f.hidden_field :status, :id=>"user_id_field" %> 
             
@@ -367,6 +367,7 @@
       let taskName = document.getElementById('taskname').value;
       let taskDueDate = document.getElementById('date').value;
       let orgId = <%= current_user.org.id %>;
+      let projectManager = <%= current_user.id %>
 
       if ( projectName == "" || projectDescription == "") {
         alert("please give your project a name and short description to continue.");
@@ -382,6 +383,7 @@
             project: {
               name: projectName,
               description: projectDescription,
+              manager: projectManager,
               status: "PLANNING IN PROGRESS"
             }
           };

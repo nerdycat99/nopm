@@ -1,5 +1,11 @@
 module TasksHelper
 
+	def get_parent_task_for(task)
+		# in a pre-req the dependency_id is the child task and task_id is the parent
+		pre_req = Prerequisite.where(:dependency_id => task.id).first
+		parent_task = Task.where(:id => pre_req.task_id).first
+	end
+
 	def format_date_as_string_from(date)
 		date.strftime("%d/%m/%Y")
 	end
@@ -39,7 +45,7 @@ module TasksHelper
 
 
 	# methods specific to Task Performer Actions
-	def update_dependency_enddate_for(task_id, date_to_set, stack)
+	def update_dependency_enddate_for(task_id, date_to_set,stack,dependency_tasks,manager)
 		dep_task_ids = get_dependencies_for(task_id)
 
 		dep_task_ids.each do | task_id |
@@ -47,23 +53,44 @@ module TasksHelper
 			task.due_date = date_to_set
 			task.save
 			stack << task
+			dependency_tasks << task
 		end
 
 		if !stack.empty?
 			next_task = stack.shift
-			update_dependency_enddate_for(next_task.id, calculate_task_start_date(next_task.due_date,next_task.duration,false),stack)
+			update_dependency_enddate_for(next_task.id, calculate_task_start_date(next_task.due_date,next_task.duration,false),stack, dependency_tasks,manager)
+		else
+			dependency_tasks.each do |dependency_task|
+				notify_task_performer_manager_changed_project_end_date(dependency_task,manager)
+			end
+
 		end
+
+
 
 	end
 
 
+	def notify_task_performer_manager_changed_project_end_date(task,manager)
+		# and generate a notification for each dependency task
+		    recipient = User.where(:id => task.user_id).first
+		    if manager 
+		    	message = "project end date changed, task assigned to you has a new start date "
+		    else
+		    	message = "tasks that follow your task have changed, your task has a new start date"
+		    end
+		    notification = Notification.create(:recipient => recipient, :actor => current_user, :action => message, :notifiable => task)
+		    notification.save
+	end
+
+
 	def get_dependencies_for(task_id)
-		tasks = []
+		dep_tasks = []
 		dependencies = Prerequisite.where(:task_id => task_id)
 		dependencies.each do | dependency |
-			tasks << dependency.dependency_id
+			dep_tasks << dependency.dependency_id
 		end
-		return tasks
+		return dep_tasks
 	end
 
 	def adjust_end_date_for(task_id,adjustment)

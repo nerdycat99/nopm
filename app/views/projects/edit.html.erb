@@ -1,5 +1,6 @@
 <h3>edit a project</h3>
 
+<!-- Find the endpoint task, this will have it's due date changed when project end date is changed-->
 <% @project.tasks.each do | task | %>
 	<% if is_endpoint(task) %>
 		<% @project_end_date = task.due_date %>

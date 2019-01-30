@@ -85,76 +85,80 @@
 
 <script type="text/javascript">
 
-$(function() {
-
-  //generate the current date
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth() + 1; //January is 0!
-  var yyyy = today.getFullYear();
-
-  if (dd < 10) {
-    dd = '0' + dd;
-  }
-
-  if (mm < 10) {
-    mm = '0' + mm;
-  }
-
-  today = mm + '/' + dd + '/' + yyyy;
-  
-  // get the json format notifications for current user - from view/notifications/index
-  $.get("/notifications.json").success( function( data ) {
-
-    // for each notification in data array build thge notification into html text
-    var htmlString = "";
-
-    $.each(data, function(index, notification) {
-      htmlElement = '<a class="dropdown-item" id= "' + notification.id + '" href="' + notification.url + '">' + notification.action + '</a>'
-      htmlString += htmlElement;
-    });
-
-    // get DOM reference to notifications and count flag and set their HTML/text
-    var notificationList = $('.notification-listing');
-    var notificationCount = $('.badge');
-    notificationList.html(htmlString);
-    notificationCount.text(data.length)
-
-    // get reference to each of the <a> tags which the above inserts
-    var notificationLinks = document.getElementById('notification-links');
-    var notificationLinkItems = notificationLinks.getElementsByTagName('a');
-
-    // map through and for each build on click method that passes notification id to
-    // notification post url - enables us to mark each notification clicked as read
-    $.each(notificationLinkItems, function(index, notification) {
-
-      notificationLinkItems[index].onclick = function (e) {
-        let notificationId = e.path[0].id
-        // console.log(notificationId)
-
-        $.post("/notifications/" + notificationId, {
-          _method: "PUT",
-          notification: {
-            read_at: today // NB: not used, we just use notificationID to find notification and set in notification controller update method to today's date
-          }
-        });
-      }
-
-    });
-
-    
-
-
-
-
+  $(function() {
+    generateNotificationAlerts();
   });
 
 
+  function getDateToday() {
+    //generate the current date
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
 
-});
+    if (dd < 10) { dd = '0' + dd; }
+    if (mm < 10) { mm = '0' + mm; }
+
+    today = mm + '/' + dd + '/' + yyyy;
+    return today
+  }
 
 
 
+  function generateNotificationAlerts() {
+
+    let today = getDateToday();
+
+    // get the json format notifications for current user - from view/notifications/index
+    $.get("/notifications.json").success( function( data ) {
+      buildNotifications(data);
+    });
+
+  }
+
+
+
+  function buildNotifications(data) {
+
+      // for each notification in data array build the notification into html text
+      var htmlString = "";
+
+      $.each(data, function(index, notification) {
+
+        htmlElement = '<a class="dropdown-item" id= "' + notification.id + '" href="' + notification.url + '">' + notification.action + '</a>'
+        htmlString += htmlElement;
+
+      });
+
+      // get DOM reference to notifications and count flag and set their HTML/text
+      var notificationList = $('.notification-listing');
+      var notificationCount = $('.badge');
+      notificationList.html(htmlString);
+      notificationCount.text(data.length)
+
+      // get reference to each of the <a> tags which the above inserts
+      var notificationLinks = document.getElementById('notification-links');
+      var notificationLinkItems = notificationLinks.getElementsByTagName('a');
+
+      // map through and for each build on click method that passes notification id to
+      // notification post url - enables us to mark each notification clicked as read
+      $.each(notificationLinkItems, function(index, notification) {
+          notification.onclick = function (e) {
+          // let notificationId = e.path[0].id
+          notificationId = notification.id;
+          // console.log(notificationId);
+
+            $.post("/notifications/" + notificationId, {
+              _method: "PUT",
+              notification: {
+                read_at: today // NB: not used, we just use notificationID to find notification and set in notification controller update method to today's date
+              }
+            });
+        }
+      });
+
+  }
 
 </script>
 

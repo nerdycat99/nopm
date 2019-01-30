@@ -33,7 +33,7 @@ class ProjectsController < ApplicationController
   private
 
   def project_params
-    @new_project = params.require(:project).permit(:name, :description, :status)
+    @new_project = params.require(:project).permit(:name, :description, :manager, :status)
   end
 
 end
