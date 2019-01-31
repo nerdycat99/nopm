@@ -108,8 +108,6 @@
 
   function generateNotificationAlerts() {
 
-    let today = getDateToday();
-
     // get the json format notifications for current user - from view/notifications/index
     $.get("/notifications.json").success( function( data ) {
       buildNotifications(data);
@@ -120,6 +118,8 @@
 
 
   function buildNotifications(data) {
+
+      let today = getDateToday();
 
       // for each notification in data array build the notification into html text
       var htmlString = "";

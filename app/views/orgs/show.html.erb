@@ -34,6 +34,7 @@
 <div class="col-10 offset-1 cnt-txt">
   <!-- Button trigger modal -->
   <%= link_to 'create new project', '#', data: {toggle: 'modal', target: '#newProject'}, class: 'btn btn-success' %>
+  <%= link_to 'create new user', '#', data: {toggle: 'modal', target: '#addUserModal'}, class: 'btn btn-success', id: 'btnShowAddUserModal', remote: true %>
 
 
 <!--  
@@ -85,7 +86,7 @@
                 </select> 
               </div>
               <div class="col-1"> 
-                <%= link_to '+', '#', data: {toggle: 'modal', target: '#addUser'}, class: 'btn btn-success', id: 'btnShowAddUserModal' %>
+                <%= link_to '+', '#', data: {toggle: 'modal', target: '#addUserModal'}, class: 'btn btn-success', id: 'btnShowAddUserModal', remote: true %>
               </div>
             </div> 
 
@@ -127,122 +128,64 @@
 
 
 
-<!-- Modal to pop up for new user from new project modal-->
-<div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseAddUser'>
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="cnt-txt">
-          <h3>add a new user</h3><br />
-        </div>
-        <% @user = User.new %>
-        <%= form_for @user, url: umakes_path(@user) do |f| %>
-        <div class="row">
-          <div class="col-10 offset-1">
+<%= render "layouts/modal" %>
 
-            <!-- First Name-->
-            <div class="col-12">
-              <h7>new users first name</h7><br />
-              <%= f.text_field :first_name, class: "newprojectadduser", autofocus: true, autocomplete: "off", placeholder: "first name", id: "newuserfirstname" %>
-             </div><br />
 
-            <!-- Last Name-->
-            <div class="col-12">
-              <h7>... and their last name</h7><br />
-              <%= f.text_field :last_name, class: "newprojectadduser", autofocus: true,autocomplete: "off", placeholder: "last name", id: "newuserlastname" %>
-            </div><br />
 
-            <!-- Email Address-->
-            <div class="col-12">
-              <h7>... and finally an email address if we might?</h7><br />
-              <%= f.text_field :email, class: "newprojectadduser", autofocus: true, placeholder: "email address", id: 'newuseremail' %>
-            </div><br />
 
-            <!-- Hidden Fields -->
-            <%= f.hidden_field :org_id, value: current_user.org_id, autocomplete: "off" %>
-            <%= f.hidden_field :status, value: "tsk", autocomplete: "off" %>
-            <%= f.hidden_field :source, value: "org-page", autocomplete: "off" %>
-            <%= f.hidden_field :projref, value: "", autocomplete: "off" %>
-            <%= f.hidden_field :password_confirmation, value: "password", autocomplete: "off" %>
-            <%= f.hidden_field :password, value: "password", autocomplete: "off" %>
-            <br />
-
-            <br /><br />
-          </div>
-        </div>
-        <div class="cnt-txt">
-          <div class="actions">
-            <%= f.submit 'continue', class: 'btn btn-success', id: 'btnCreateNewProjectAddUser' %>
-            <br />
-          </div>
-        </div>
-
-        <% end %>
-      </div>
-      </div>
-    </div>
-  </div>
 
 
 <script type='text/javascript'>
 
 
-    // for ensuring that modals remove all data when they close!!
-    $('body').on('hidden.bs.modal', '.modal', function () {
-      $(this).removeData('bs.modal');
+  // for ensuring that modals remove all data when they close!!
+  $('body').on('hidden.bs.modal', '.modal', function () {
+    $(this).removeData('bs.modal');
+  });
+
+  
+
+  // initiliase the selection drop down for choosing task performer
+  $(document).on('turbolinks:load', function() { 
+
+    $(".js-example-placeholder-single").select2({
+      placeholder: "select or add person",
+      allowClear: true
     });
 
-    // reference to the add a user modal's confirmation button 
-    dialogAddUser = document.getElementById("addUser");
+    var dateSelected = $('#date option:selected').val();
 
-    // reference to all add user fields that user might enter data into 
-    var userEmailForAppendOptionList;
-    let taskPerformer;
+    // get the selection for task performer field
+    $( "select" )
+      .change(function() {
+      var userIdForSelectedTaskPerformer = "";
+      $( "select option:selected" ).each(function() {
+        var userIdForSelectedTaskPerformer = $('#test option:selected').val();
+        $("#user_id_field").val(userIdForSelectedTaskPerformer);
 
-    // initiliase the selection drop down for choosing task performer
-    $(document).on('ready turbolinks:load', function() { 
+          // if selected user is one added at this point (i.e. not an existing user) it is identifiable by having a value of zero, therefore get reference to new user...
+          if (userIdForSelectedTaskPerformer == 0 ) {
+            // find user object where the email matches the 'new users' email from
+            $.get( "/orgs").success(function( data ) {
+              data.forEach(function (user) {
+                console.log(user);
+                if (user.email == userEmailForAppendOptionList) {
+                  // alert(user.id);
+                  taskPerformer = user.id;
+                }
+              });                
+            });
 
-      $(".js-example-placeholder-single").select2({
-        placeholder: "select or add person",
-        allowClear: true
-      });
-
-      var dateSelected = $('#date option:selected').val();
-
-      // get the selection for task performer field
-      $( "select" )
-        .change(function() {
-        var userIdForSelectedTaskPerformer = "";
-        $( "select option:selected" ).each(function() {
-          var userIdForSelectedTaskPerformer = $('#test option:selected').val();
-          $("#user_id_field").val(userIdForSelectedTaskPerformer);
-
-            // if selected user is one added at this point (i.e. not an existing user) it is identifiable by having a value of zero, therefore get reference to new user...
-            if (userIdForSelectedTaskPerformer == 0 ) {
-              // find user object where the email matches the 'new users' email from
-              $.get( "/orgs").success(function( data ) {
-                data.forEach(function (user) {
-                  console.log(user);
-                  if (user.email == userEmailForAppendOptionList) {
-                    // alert(user.id);
-                    taskPerformer = user.id;
-                  }
-                });                
-              });
-
-            } else {
-              // ...user value not zero, therefore must be an existing user, continue and use value in drop down as normal
-              taskPerformer = document.getElementById('user_id_field').value;
-            }
-            
-        });
+          } else {
+            // ...user value not zero, therefore must be an existing user, continue and use value in drop down as normal
+            taskPerformer = document.getElementById('user_id_field').value;
+          }
+          
       });
     });
+  });
+
+  
 
 
 
@@ -254,174 +197,80 @@
 
 
 
-    // this function runs when the user clicks continue at the Add a New User Modal
-    // which appears over the top of the main Create New Project Modal
-    $(document).on('turbolinks:load', function() {
 
-      $("#btnCreateNewProjectAddUser").on('click', function(){
-        userEmailForAppendOptionList = document.getElementById('newuseremail').value;
-
-        var firstName = document.getElementById('newuserfirstname').value;
-        var lastName = document.getElementById('newuserlastname').value;
-        let validEmailChar = "^[-0-9A-Za-z!#$%&'*+/=?^_`{|}~.]+@[-0-9A-Za-z!#$%&'*+/=?^_`{|}~.]+";
-
-
-        alert(userEmailForAppendOptionList);
-
-        if ( firstName == "" || lastName == "" ) {
-          alert("please enter a name and email address for the new user to proceed.");
-          return false;
-        } else {
-          if ( !userEmailForAppendOptionList.match(validEmailChar) ) {
-            alert("not a valid email address.");
-            return false;
-          } else {
-
-          }
-        }
-        
-  /*
-        let userFirstName = document.getElementById('newuserfirstname').value;
-        let userLastName = document.getElementById('newuserlastname').value;
-        let userEmail = document.getElementById('newuseremail').value;
-        let userOrgId = <%= current_user.org.id %>;
-        let userStatus = "tsk";
-        let password = document.getElementById('passwordone').value;
-        let passwordConfirmation = document.getElementById('passwordtwo').value;
-
-
-
-        // check data entry
-        if ( userFirstName == "" || userLastName == "" || userEmail == "" || password == "" || passwordConfirmation == "" ) {
-          alert("please enter information in all the fields");
-          return false;
-        } else {
-          if ( password != passwordConfirmation ) {
-            alert("please ensure you type the same password in twice");
-            return false;
-          } else {
-            if (password.length < 6 ) {
-              alert("password needs to be at least 6 characters");
-              return false;
-            } else {
-        
-              let newUserPath = "/users";
-              
-              var newUser = {
-                user: {
-                  first_name: userFirstName,
-                  last_name: userLast,
-                  email: userEmail,
-                  password: password,
-                  org_id: userOrgId,
-                  status: userStatus
-                }
-              };
-
-
-
-              alert("hello");
-
-              
-              
-
-              $.post(newUserPath, newUser).success(function(data) {
-                alert("this is done");
-              });
-            }
-          }
-          return false;
-        }
-        */
-        
-       
-        
-       //  check input of user, if okay proceed to do below
-       // else return error message and return false so add user page stays up
-       // now how to refresh the option list for newProject
-
-        // force dismiss the add new user dialog - get refrence to close button and run it
-        btnCloseAddNewUserModal = document.getElementById("btnCloseAddUser");
-        btnCloseAddNewUserModal.click();
-
-        $("#test").append($('<option>', {value: 0,text: userEmailForAppendOptionList}));
-        return true; 
-      });
-    });
 
     // runs when user clicks for more info about creating a new project
-    $(document).on('turbolinks:load', function() {
+//    $(document).on('turbolinks:load', function() {
+
       $("#btnCreateNewProjectHelp").on('click', function(){
         alert("this will show a help dialog about what the end task is etc.");
         return false;
       });
-    });
+      
+//    });
 
     // runs when the user clicks continue to create a new project
-    $(document).on('turbolinks:load', function() {
+  //  $(document).on('turbolinks:load', function() { ** breaks when we split to partial
 
       $("#btnCreateNewProject").on('click', function(){
 
-      let projectName = document.getElementById('projectname').value;
-      let projectDescription = document.getElementById('projectdesc').value;
-      let taskName = document.getElementById('taskname').value;
-      let taskDueDate = document.getElementById('date').value;
-      let orgId = <%= current_user.org.id %>;
-      let projectManager = <%= current_user.id %>
+        let projectName = document.getElementById('projectname').value;
+        let projectDescription = document.getElementById('projectdesc').value;
+        let taskName = document.getElementById('taskname').value;
+        let taskDueDate = document.getElementById('date').value;
+        let orgId = <%= current_user.org.id %>;
+        let projectManager = <%= current_user.id %>
 
-      if ( projectName == "" || projectDescription == "") {
-        alert("please give your project a name and short description to continue.");
-        return false;
-      } else {
-        if ( taskName == "" || taskDueDate == "" || taskPerformer == null) {
-          alert("please tell us what this project will produce, who will do it and by when.");
+        if ( projectName == "" || projectDescription == "") {
+          alert("please give your project a name and short description to continue.");
           return false;
         } else {
-          // construct path and the payload for creating a new project
-          let newProjectPath = "/orgs/" + orgId + "/projects";
-          var newProject = {
-            project: {
-              name: projectName,
-              description: projectDescription,
-              manager: projectManager,
-              status: "PLANNING IN PROGRESS"
-            }
-          };
-          // ... and now use to POST new project and act upon success
-          $.post(newProjectPath, newProject).success(function(data) {
-          //  alert(data.id)
-            let projectId = data.id
-            let newTaskPath = "/orgs/" + orgId + "/projects/" + projectId + "/tasks";
-
-            // construct the payload for creating a new task
-            var newTask = {
-              task: {
-                title: taskName,
-                user_id: taskPerformer, 
-                status: "NEW",
-                due_date: taskDueDate
+          if ( taskName == "" || taskDueDate == "" || taskPerformer == null) {
+            alert("please tell us what this project will produce, who will do it and by when.");
+            return false;
+          } else {
+            // construct path and the payload for creating a new project
+            let newProjectPath = "/orgs/" + orgId + "/projects";
+            var newProject = {
+              project: {
+                name: projectName,
+                description: projectDescription,
+                manager: projectManager,
+                status: "PLANNING IN PROGRESS"
               }
             };
-            // ... POST new task, if successful inform user and close Create New Project Modal
-            $.post(newTaskPath, newTask).success(function(data) {
+            // ... and now use to POST new project and act upon success
+            $.post(newProjectPath, newProject).success(function(data) {
+            //  alert(data.id)
+              let projectId = data.id
+              let newTaskPath = "/orgs/" + orgId + "/projects/" + projectId + "/tasks";
 
-              // force dismiss create new project modal by getting reference to Modal close X
-              btnCloseCreateProjectModal = document.getElementById("btnCloseCreateProject");
-              btnCloseCreateProjectModal.click();
+              // construct the payload for creating a new task
+              var newTask = {
+                task: {
+                  title: taskName,
+                  user_id: taskPerformer, 
+                  status: "NEW",
+                  due_date: taskDueDate
+                }
+              };
+              // ... POST new task, if successful inform user and close Create New Project Modal
+              $.post(newTaskPath, newTask).success(function(data) {
 
-              alert("great, we created a new project for you!! taskPerformer has been sent an alert that they have a new task in their queue.")
-            });
+                // force dismiss create new project modal by getting reference to Modal close X
+                btnCloseCreateProjectModal = document.getElementById("btnCloseCreateProject");
+                btnCloseCreateProjectModal.click();
 
-          }); 
-          return false;
+                alert("great, we created a new project for you!! taskPerformer has been sent an alert that they have a new task in their queue.")
+              });
+
+            }); 
+            return false;
+          }
         }
-      }
-    });
+      });
  
-
- }); // closing braces for the turbolinks fix to ensure code runs correctly across multiple new project creations without page refresh
-
-
+//    }); // end of outer function within which we manage on click action for create new project
 
 
 
