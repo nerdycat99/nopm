@@ -1,0 +1,154 @@
+<!-- Modal to pop up for new user from new project modal-->
+<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseAddUser'>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cnt-txt">
+          <h3>add a new user</h3><br />
+        </div>
+        <% @user = User.new %>
+        <%= form_for @user, url: umakes_path(@user), remote: true do |f| %>
+        <div class="row">
+          <div class="col-10 offset-1">
+
+            <!-- First Name-->
+            <div class="col-12 addnewuser">
+              <h7>new users first name</h7><br />
+              <%= f.text_field :first_name, class: "newprojectadduser", autofocus: true, autocomplete: "off", placeholder: "first name", id: "newuserfirstname" %>
+             </div><br />
+
+            <!-- Last Name-->
+            <div class="col-12 addnewuser">
+              <h7>... and their last name</h7><br />
+              <%= f.text_field :last_name, class: "newprojectadduser", autofocus: true,autocomplete: "off", placeholder: "last name", id: "newuserlastname" %>
+            </div><br />
+
+            <!-- Email Address-->
+            <div class="col-12 addnewuser">
+              <h7>... and finally an email address if we might?</h7><br />
+              <%= f.text_field :email, class: "newprojectadduser", autofocus: true, placeholder: "email address", id: 'newuseremail' %>
+            </div><br />
+
+            <!-- User Type-->
+            <div class="col-12 addnewuser">
+              <h7>type of user</h7><br />
+               <p>
+                <%= f.radio_button :status, 'mng', id: 'usertypemng' %>manager<br />
+                <%= f.radio_button :status,'tsk', id: 'usertypetsk' %>task performer<br />
+              </p>
+            </div>
+
+
+
+            <!-- Hidden Fields -->
+            <%= f.hidden_field :org_id, value: current_user.org_id, autocomplete: "off" %>
+            <!--<%= f.hidden_field :status, value: "tsk", autocomplete: "off" %>-->
+            <%= f.hidden_field :source, value: "org-page", autocomplete: "off" %>
+            <%= f.hidden_field :projref, value: "", autocomplete: "off" %>
+            <%= f.hidden_field :password_confirmation, value: "password", autocomplete: "off" %>
+            <%= f.hidden_field :password, value: "password", autocomplete: "off" %>
+            <br />
+
+            <br /><br />
+          </div>
+        </div>
+        <div class="cnt-txt">
+          <div class="actions">
+            <%= f.submit 'continue', class: 'btn btn-success', id: 'btnCreateNewProjectAddUser' %>
+            <br />
+          </div>
+        </div>
+
+        <% end %>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+  <script type='text/javascript'>
+
+
+
+    // reference to the add a user modal's confirmation button 
+    dialogAddUser = document.getElementById("addUser");
+
+    // reference to all add user fields that user might enter data into 
+    var userEmailForAppendOptionList;
+    let taskPerformer;
+
+
+    // outer function that ensures code only runs once when ready
+//    $(document).on('ready turbolinks:load', function() { 
+
+      // this function runs when the user clicks continue at the Add a New User Modal
+      // which appears over the top of the main Create New Project Modal
+      $(document).on('turbolinks:load', function() { 
+
+
+
+        // for ensuring that modals remove all data when they close!!
+        $('.modal').on('hidden.bs.modal', function (e) {
+
+          $(".addnewuser input").val("")
+
+          var radioTsk = document.getElementById('usertypetsk');
+          var radioMngr = document.getElementById('usertypemng');
+          radioMngr.checked = false;
+          radioTsk.checked = false;
+        });
+
+
+        
+
+        $("#btnCreateNewProjectAddUser").on('click', function(){
+          userEmailForAppendOptionList = document.getElementById('newuseremail').value;
+
+          var firstName = document.getElementById('newuserfirstname').value;
+          var lastName = document.getElementById('newuserlastname').value;
+          let validEmailChar = "^[-0-9A-Za-z!#$%&'*+/=?^_`{|}~.]+@[-0-9A-Za-z!#$%&'*+/=?^_`{|}~.]+";
+          var mngRadio = document.getElementById('usertypemng').checked;
+          var tskRadio = document.getElementById('usertypetsk').checked;
+
+
+          if ( firstName == "" || lastName == "" ) {
+            alert("please enter a name and email address for the new user to proceed.");
+            return false;
+          } else {
+            if ( !userEmailForAppendOptionList.match(validEmailChar) ) {
+              alert("not a valid email address.");
+              return false;
+            } else {
+              if ( mngRadio == false && tskRadio == false) {
+                alert("please select the type of user account to be created.");
+                return false;
+              } else {
+                
+              }
+            }
+          }
+
+
+          // force dismiss the add new user dialog - get refrence to close button and run it
+          btnCloseAddNewUserModal = document.getElementById("btnCloseAddUser");
+          btnCloseAddNewUserModal.click();
+
+          $("#test").append($('<option>', {value: 0,text: userEmailForAppendOptionList}));
+          return true; 
+        });
+  //    }); ** breask when we split to partial
+
+    }); 
+
+
+  </script>
