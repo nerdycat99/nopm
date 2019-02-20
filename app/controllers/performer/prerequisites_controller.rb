@@ -10,7 +10,8 @@ class Performer::PrerequisitesController < ApplicationController
   def create
     @project = Project.find(params[:project_id])
     @prerequisite = Prerequisite.create(prerequisite_params)
-    redirect_to performer_org_project_path(current_user.org_id,@project)
+    redirect_back(fallback_location: root_path); # ensures page is reloaded and dropdown list is correct
+    # redirect_to performer_org_project_path(current_user.org_id,@project)
   end
 
   def destroy

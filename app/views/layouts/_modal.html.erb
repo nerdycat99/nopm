@@ -143,7 +143,9 @@
           btnCloseAddNewUserModal = document.getElementById("btnCloseAddUser");
           btnCloseAddNewUserModal.click();
 
+          // this appends the new user just created to dropdowns 
           $("#test").append($('<option>', {value: 0,text: userEmailForAppendOptionList}));
+          $("#select2insidemodal").append($('<option>', {value: 0,text: userEmailForAppendOptionList}));
           return true; 
         });
   //    }); ** breask when we split to partial

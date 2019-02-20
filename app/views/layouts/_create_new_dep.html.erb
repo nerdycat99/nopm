@@ -1,0 +1,113 @@
+
+<!-- Modal to allow user to create a new dependency task -->
+<div class="modal fade" id="modal_create_dep" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<% at_task_creation = true %>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id= 'btnCloseCreateNewDepTask'>
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">create a new task</h4>
+      </div>
+      <div class="modal-body">
+        
+        <h5>Do you need someone to do something before you can start working on your task?</h5><br />
+        <h6>You can create a new task here as a dependency for your task and assign it to someone.</h6>
+        <br /><br />
+
+        <!-- build set of available users for select drop down & instantiate new task -->
+        <% @dependency_task = Task.new %>
+        <% @users_for_selection = User.where(:org_id => current_user.org_id) %>
+
+        <%= simple_form_for @dependency_task, url: performer_org_project_tasks_path(current_user.org_id, @project) do |f| %>
+          
+          <%= f.input :title, input_html: { id: "task_title" } %>
+          <%= f.input :description, input_html: { id: "task_description" } %>
+          
+          <%= f.hidden_field :user_id, :id=>"user_id_field" %>
+          <%= f.hidden_field :status, value: "NEW", autocomplete: "off" %>
+          <%= f.hidden_field :due_date, value: calculate_new_task_due_date_from(@task), autocomplete: "off" %>
+          <%= f.hidden_field :parent_task, value: @task.id, autocomplete: "off" %>
+
+          
+          <br /><br />
+
+
+          <!-- select user / create new user -->
+          <div class="row">
+            <div class="col-10">
+              <select class="js-example-placeholder-single js-states form-control" id="selectUser" style="width:100%;">
+              <option></option>
+              <% @users_for_selection.each do |eligble_user| %>
+                <option value="<%= eligble_user.id %>" data-favorite-color="<%= eligble_user.first_name %>" id="selectUser"><%= eligble_user.email %></option>
+              <% end %>
+              </select> 
+
+            </div>
+            <div class="col-1">
+              <%= link_to '+'.html_safe, '#', data: {toggle: 'modal', target: '#modal_create_user'}, class: 'btn btn-success', id: 'btnCreateNewUser', remote: true %>
+              
+            </div>
+          </div>
+
+
+
+          <%= f.submit 'create task', class: 'btn btn-success', id: 'btnCreateNewDepTask' %>
+         
+          <%= link_to 'create new user', new_umake_path(:source => "task-page", :projref => @project.id), class: 'btn btn-success' %>
+        <% end %>
+      </div>
+
+      <div class="modal-footer">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script type='text/javascript'>
+
+
+    $(document).ready(function() {
+
+      // js-example-placeholder-single js-states form-control
+      $(".js-example-placeholder-single").select2({
+        placeholder: "select who to assign this task to, start typing their email",
+        allowClear: true
+      });
+
+
+      let userSelection = document.getElementById('selectUser');
+      let taskDescription = document.getElementById('task_description');
+      let taskTitle = document.getElementById('task_title');
+      let btnCloseCreateNewDepTask = document.getElementById("btnCloseCreateNewDepTask");
+
+
+      // get the selection for task performer field
+      $( "select" )
+        .change(function() {
+        var userSelected = "";
+        $( "select option:selected" ).each(function() {
+          var userIdForSelectedTaskPerformer = $('#selectTask option:selected').val();
+      //    alert(userIdForSelectedTaskPerformer);
+
+          //assign selected value to hidden field
+          $("#dependency_id_field").val(userIdForSelectedTaskPerformer);
+
+       //   taskPerformer = document.getElementById('user_id_field').value;
+
+            
+        });
+      });
+
+      
+      // user clicks continue
+
+
+    });
+    
+</script>

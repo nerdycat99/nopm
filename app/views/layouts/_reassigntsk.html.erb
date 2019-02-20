@@ -1,0 +1,79 @@
+<!-- Modal for re-assigning a task to another user-->
+<div class="modal fade" id="reassigntask" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseReassignTask'>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cnt-txt">
+          <h3>re-assign task</h3><br />
+        </div>
+
+        <%= form_for @this_task, url: performer_org_project_task_path, remote: true do |f| %>
+        <div class="row cnt-txt">
+          <div class="col-10 offset-1">
+
+            <h7>choose someone to re-assign this task to</h7><br /><br />
+
+            <!-- Select User To Re-assign Task to-->
+            <select class="js-example-placeholder-single js-states form-control" id="test">
+              <option></option>
+              <% User.where(:org_id => current_user.org_id).each do |user| %>
+                <option value="<%= user.id %>" data-favorite-color="<%= user.first_name %>"><%= user.email %></option>
+              <% end %>
+            </select> 
+
+            <!-- Hidden Fields  -->
+            <%= f.hidden_field :user_id, :id=>"user_id_field" %>
+            <%= f.hidden_field :status, value: "REA", autocomplete: "off" %>
+            <br />
+
+            <br /><br />
+          </div>
+        </div>
+        <div class="cnt-txt">
+          <div class="actions">
+            <%= f.submit 're-assign task', class: 'btn btn-success', id: 'btnReassignTask' %>
+            <br />
+          </div>
+        </div>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type='text/javascript'>
+
+    $(".js-example-placeholder-single").select2({
+      placeholder: "select who to re-assign this task to",
+      allowClear: true
+    });
+
+
+    $("#btnReassignTask").on('click', function(){
+      // force dismiss the modal after user clicks accept
+      btnCloseReassignTask = document.getElementById("btnCloseReassignTask");
+      btnCloseReassignTask.click();
+    });
+
+
+    //  var dateSelected = $('#date option:selected').val();
+
+      // get the selection for user
+        $( "select" )
+          .change(function() {
+          var str = "";
+          $( "select option:selected" ).each(function() {
+            //  var str = $('#test option:selected').text();
+            var str = $('#test option:selected').val();
+            $("#user_id_field").val(str);
+            //   alert(str);
+            });
+          });
+      
+</script>

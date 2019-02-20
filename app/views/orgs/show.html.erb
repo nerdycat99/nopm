@@ -65,7 +65,7 @@
         <% @project = Project.new %>
         <%= simple_form_for @project, url: org_projects_path(@org) do |f| %>
         <div class="row">
-          <div class="col-10 offset-1">
+          <div class="col-10 offset-1"> 
 
             <!-- task name -->
             <%= f.input :status, validate: true, label: "what will this project produce?", placeholder: "project outcome or endpoint", input_html: { id: "taskname" } %>

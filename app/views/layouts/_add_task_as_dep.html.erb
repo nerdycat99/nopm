@@ -1,0 +1,119 @@
+<!-- Modal for adding a dependency to the task, select existing or button to create new dep task-->
+<div class="modal fade" id="modal_assign_dep" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id= 'btnCloseMakeTaskDependency'>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cnt-txt">
+          <h3>add task as a dependency</h3><br />
+        </div>
+          <% all_tasks = Task.where(:project_id => @task.project_id) %>
+          <%= simple_form_for Prerequisite.new, url: performer_org_project_prerequisites_path(@task.project) do |f| %>
+          <div class="row">
+            <div class="col-10 offset-1">
+
+
+              <h6>if another task needs to finish before you can start working on your task you 
+              can select it below.</h6>
+              <h6>if you don't see the task you need to finish first click the '+' button to create it. </h6><br />
+
+              <!-- build set of available tasks to select from -->
+              <% dep_map = [] %>
+              <% all_tasks.each do |task| %>
+                <% if is_endpoint(task) %>
+                  <% dep_map = build_dependencies_from(task) %>
+                <% end %>
+              <% end %>
+              <% all_task_paths = get_unique_paths(dep_map, true) %>
+              <% tasks_available_for_selection = calculate_valid_dependecies_for_task(all_task_paths, @task.id) %>
+              <!-- ******************** WE HAVE TO EXCLUDE ANY TASK THAT IS ALREADY A PRE-REQ -->
+
+
+              <!-- select task / create new task -->
+              <div class="row">
+                <div class="col-10">
+                  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+                  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css" />
+
+                  <select class="js-example-placeholder-single js-states form-control" id="selectTask" style="width:100%;">
+                  <option></option>
+                  <% tasks_available_for_selection.each do |available_task| %>
+
+                    <option value="<%= available_task.id %>" data-favorite-color="<%= available_task.title %>" id="selectTask"><%= available_task.title %></option>
+                  
+                  <% end %>
+                  </select> 
+
+                </div>
+                <div class="col-1">
+                  <%= link_to '+'.html_safe, '#', data: {toggle: 'modal', target: '#modal_create_dep'}, class: 'btn btn-success', id: 'XXX', remote: true %>
+                  <%= f.submit '++', class: 'btn btn-success', id: 'btnCreateANewTask', remote: true  %>
+                </div>
+              </div>
+
+                <%= f.hidden_field :task_id, value: @task.id, autocomplete: "off" %>
+                <%= f.hidden_field :dependency_id, :id=>"dependency_id_field" %>
+
+                <br /><br />
+            </div>
+          </div>
+          <div class = "cnt-txt">
+            <%= f.submit 'continue', class: 'btn btn-success', id: 'btnMakeTaskDependency' %>
+            <button type="button" class="btn btn-success" data-dismiss="modal">close</button>
+          </div>
+          <% end %>
+      </div>    
+    </div>
+    <div class="modal-footer">
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  // for ensuring that modals remove all data when they close!!
+  $('body').on('hidden.bs.modal', '.modal', function () {
+    $(this).removeData('bs.modal');
+  });
+
+  
+
+  // initiliase the selection drop down for choosing task performer
+  $(document).on('turbolinks:load', function() { 
+
+    $(".js-example-placeholder-single").select2({
+      placeholder: "select task",
+      allowClear: true
+    });
+
+
+  // get the selection for task performer field
+  $( "select" )
+    .change(function() {
+    var selectedTask = "";
+    $( "select option:selected" ).each(function() {
+      var userIdForSelectedTaskPerformer = $('#selectTask option:selected').val();
+      alert(userIdForSelectedTaskPerformer);
+
+      //assign selected value to hidden field
+      $("#dependency_id_field").val(userIdForSelectedTaskPerformer);
+
+   //   taskPerformer = document.getElementById('user_id_field').value;
+
+        
+    });
+  });
+
+
+});
+
+
+</script>

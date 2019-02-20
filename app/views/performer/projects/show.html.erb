@@ -18,7 +18,7 @@
 
 
 <% @project.tasks.each do |task| %>
-  <% if task.status == "NEW" && task.user_id == current_user.id %>
+  <% if task.status == "NEW" || task.status == "REA" && task.user_id == current_user.id %>
     <% @new_tasks << task %>
   <% elsif task.user_id == current_user.id %>
     <% @inprog_tasks << task %>

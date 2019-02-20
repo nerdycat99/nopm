@@ -133,6 +133,18 @@ li.dropdown:last-child .dropdown-menu {
 }
 
 
+#createNewDepTask {
+  z-index: 1900; 
+}
+
+.select2-container--open {
+    z-index: 9999999
+}
+
+#addUserModal {
+  z-index: 2000; 
+}
+
 
 
 

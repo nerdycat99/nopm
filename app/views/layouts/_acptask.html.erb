@@ -1,0 +1,76 @@
+<!-- Modal to accept task-->
+<div class="modal fade" id="acptask" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseAcceptTask'>
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="cnt-txt">
+          <h3>task: <%= @this_task.title %></h3><br />
+        </div>
+
+        <%= form_for @this_task, url: performer_org_project_task_path, remote: true do |f| %>
+        <div class="row">
+          <div class="col-10 offset-1">
+
+            <h7>how long do you expect it will take to complete this task?</h7><br /><br />
+
+            <!-- Duration-->
+            <div class="col-12 addnewuser">
+              <h7>number of days to complete this task</h7><br />
+              <%= f.number_field :duration, class: "newprojectadduser", autofocus: true,autocomplete: "off", placeholder: "0", id: "newuserlastname" %>
+            </div><br />
+
+            <!-- Description-->
+            <div class="col-12 addnewuser">
+              <h7>task description</h7><br />
+              <%= f.text_field :description, class: "newprojectadduser", autofocus: true, autocomplete: "off", placeholder: "description", id: "newuserfirstname" %>
+             </div>
+
+            <!-- Hidden Fields  -->
+            <%= f.hidden_field :status, value: "ACP", autocomplete: "off" %>
+            <br />
+
+            <br /><br />
+          </div>
+        </div>
+        <div class="cnt-txt">
+          <div class="actions">
+            <%= f.submit 'accept', class: 'btn btn-success', id: 'btnAcceptTheTask' %>
+            <br />
+          </div>
+        </div>
+
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+    
+    $("#btnAcceptTheTask").on('click', function() {
+
+      // force dismiss the modal after user clicks accept
+      btnCloseAcceptTask = document.getElementById("btnCloseAcceptTask");
+      btnCloseAcceptTask.click();
+    });
+
+
+  </script>

@@ -1,58 +1,70 @@
-<% user = User.where(:id => @task.user_id).first %>
+<% at_task_creation = false %>
+<% user = User.where(:id => @this_task.user_id).first %>
 <% user_assigned_to_this_task = false %>
 <% if user == current_user %>
   <% user_assigned_to_this_task = true %>
 <% end %>
+
+<% @project = Project.where(:id => @this_task.project_id).first %>
 
 <h1>task performers show task page</h1>
 <br /><br />
 <div class="col12 offset-1">
   <div class="row">
     <div class="booyah-box col-6">
-        <h3><%= @task.title %></h3>
+        <h3>@project: <%= @project.name %></h3>
         <br />
-        description: <%= @task.description %><br />
-        status: <%= @task.status %><br />
-        duration: <%= @task.duration %><br />
-        due date: <%= @task.due_date %><br />
+        <h6>task: <%= @this_task.title %></h6>
+        status: <%= @this_task.status %><br />
+        description: <%= @this_task.description %><br />
+        <% if @this_task.status != "NEW" %>
+          duration: <%= @this_task.duration %><br />
+          start date: <%= calculate_task_start_date(@this_task.due_date,@this_task.duration,true) %> - 
+        <% end %>
+        due date: <%= format_date_as_string_from(@this_task.due_date) %><br />
         assigned to: <%= user.email %><br /><br />
 
         <% if user_assigned_to_this_task %>
-          <% if @task.status == "NEW" %>
-            <%= link_to "accept task", edit_performer_org_project_task_path(current_user.org, @task.project_id, @task), class: 'btn btn-success' %>
+          <% if @this_task.status == "NEW" || @this_task.status == "REA" %>
+            <%= link_to 'accept task', '#', data: {toggle: 'modal', target: '#acptask'}, class: 'btn btn-success', id: 'btnAcceptTask', remote: true %>
+            <%= link_to 'reassign task', '#', data: {toggle: 'modal', target: '#reassigntask'}, class: 'btn btn-success', id: 'btnReassignTask', remote: true %>
+            <%= link_to 'reject task', '#', data: {toggle: 'modal', target: '#rejecttask'}, class: 'btn btn-success', id: 'btnRejectTask', remote: true %>
           <% else %>
-            <%= link_to "edit task", edit_performer_org_project_task_path(current_user.org, @task.project_id, @task), class: 'btn btn-success' %>
+            <%= link_to "edit task", edit_performer_org_project_task_path(current_user.org, @this_task.project_id, @this_task), class: 'btn btn-success' %>
           <% end %>
         <% end %>
 
     </div>
 
+    <%= render "layouts/acptask" %>
+    <%= render "layouts/reassigntsk" %>
+    <%= render "layouts/rejecttask" %>
+    <%= render "layouts/modal" %>
+
     <div class="booyah-box col-4">
       <h3>Dependencies For This Task</h3>
       <br />
-      <% @task.prerequisites.inspect %>
-      <% @task.dependencys.each do |dependency| %>
-      <%= link_to dependency.title, performer_org_project_task_path(current_user.org, @task.project_id, dependency.id), class: 'nav-link' %><br />
+      <% @this_task.prerequisites.inspect %>
+      <% @this_task.dependencys.each do |dependency| %>
+      <%= link_to dependency.title, performer_org_project_task_path(current_user.org, @this_task.project_id, dependency.id), class: 'nav-link' %><br />
       <% end %>
       <br />
-      <% if user_assigned_to_this_task %>
-        <% if @task.status == "NEW" %>
-          <h5>you will need to accept this task first then you can create dependency tasks </h5>
-        <% else %>
-          <%= link_to 'create a new task as dependency', new_performer_org_project_task_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %>
-          <br /><br />
-          <%= link_to 'select existing task as dependency', new_performer_org_project_prerequisites_path(current_user.org, @task.project_id, :parent_task => @task), class: 'btn btn-success' %>
-          <!-- Button trigger modal -->
-          <%= link_to 'select existing task as dependency2', '#', data: {toggle: 'modal', target: '#myModal'}, class: 'btn btn-success' %>
+      <div class = "cnt-txt">
+        <% if user_assigned_to_this_task %>
+          <% if @this_task.status == "NEW" || @this_task.status == "REA" %>
+            <h5>you will need to accept this task first then you can create dependency tasks </h5>
+          <% else %>
+            <%= link_to 'add a dependency<br />for this task'.html_safe, '#', data: {toggle: 'modal', target: '#modal_assign_dep'}, class: 'btn btn-success', id: 'btnCreateDepTask' %>
+          <% end %>
         <% end %>
-      <% end %>
+      </div>
     </div>
 
   </div>
 </div>
 
   <br />
-  <% tasks_dependent_upon_task = Prerequisite.where(:dependency_id => @task.id) %>
+  <% tasks_dependent_upon_task = Prerequisite.where(:dependency_id => @this_task.id) %>
   <% if tasks_dependent_upon_task.count < 1 %>
     <h3>This Task is the EndPoint</h3>
   <% else %>
@@ -66,63 +78,160 @@
 <br />
 <div class = "cnt-txt">
   <% if user_assigned_to_this_task %>
-    <%= link_to 'back to project page', performer_org_project_path(current_user.org, @task.project_id), class: 'btn btn-success' %>
+    <%= link_to 'back to project page', performer_org_project_path(current_user.org, @this_task.project_id), class: 'btn btn-success' %>
   <% else %>
     <%= link_to 'back', :back, class: 'btn btn-success' %>
   <% end %>
+  <%= link_to 'help', '#', data: {toggle: 'modal', target: '#myModal'}, class: 'btn btn-success' %>
+
 </div>
 
 
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+
+
+
+<!-- Modal for adding a dependency to the task, select existing or button to create new dep task-->
+<div class="modal fade" id="modal_assign_dep" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id= 'btnCloseMakeTaskDependency'>
           <span aria-hidden="true">×</span>
         </button>
-        <h4 class="modal-title" id="myModalLabel">select task as dependency</h4>
       </div>
       <div class="modal-body">
-        
+        <div class="cnt-txt">
+          <h3>add task as a dependency</h3><br />
+        </div>
+          <% all_tasks = Task.where(:project_id => @this_task.project_id) %>
+          <%= simple_form_for Prerequisite.new, url: performer_org_project_prerequisites_path(@this_task.project) do |f| %>
+          <div class="row">
+            <div class="col-10 offset-1">
 
-          <% all_tasks = Task.where(:project_id => @task.project_id) %>
 
-          <h5>Do you need someone to do something before you can start working on your task?</h5><br />
-          <h6>You can select an existing task that your task will be dependent upon below. Otherwise you can create a new task that has to happen before you can start your task.</h6>
-          <br /><br />
-            <%= simple_form_for Prerequisite.new, url: performer_org_project_prerequisites_path(@task.project) do |f| %>
-              
-            <% dep_map = [] %>
+              <h6>tell us what needs to happen before you can start work.</h6>
+              <h6>if you don't see the task which must complete before you can begin click the '+' button to create it. </h6><br />
+
+              <!-- build set of available tasks to select from -->
+              <% dep_map = [] %>
               <% all_tasks.each do |task| %>
                 <% if is_endpoint(task) %>
                   <% dep_map = build_dependencies_from(task) %>
                 <% end %>
               <% end %>
               <% all_task_paths = get_unique_paths(dep_map, true) %>
-              <% tasks_available_for_selection = calculate_valid_dependecies_for_task(all_task_paths, @task.id) %>
+              <% tasks_available_for_selection = calculate_valid_dependecies_for_task(all_task_paths, @this_task.id) %>
+              <!-- ******************** WE HAVE TO EXCLUDE ANY TASK THAT IS ALREADY A PRE-REQ -->
 
-              <select class="js-example-placeholder-single js-states form-control" id="selectTask">
-              <option></option>
-              <% tasks_available_for_selection.each do |task| %>
-                <option value="<%= task.id %>" data-favorite-color="<%= task.title %>"><%= task.title %></option>
-              <% end %>
-              </select>
 
-            <%= f.hidden_field :task_id, value: @task.id, autocomplete: "off" %>
-            <%= f.hidden_field :dependency_id, :id=>"dependency_id_field" %>
+              <!-- select task / create new task -->
+              <div class="row">
+                <div class="col-10">
+                  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+                  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+                  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css" />
 
-            <br /><br />
+                  <select class="select_a_task" id="selectTask" style="width:100%;">
+                    <option></option>
+                    <% tasks_available_for_selection.each do |available_task| %>
 
-            <%= f.submit 'create dependency link', class: 'btn btn-success' %>
-            <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+                      <option value="<%= available_task.id %>" data-favorite-color="<%= available_task.title %>" id="selectTask"><%= available_task.title %></option>
+                    
+                    <% end %>
+                  </select> 
+
+                </div>
+                <div class="col-1">
+                  <a href="#createNewDepTask" data-toggle="modal" data-dismiss="modal" class="btn btn-success" id="goto_create_dep_task">+</a>
+                </div>
+              </div>
+
+                <%= f.hidden_field :task_id, value: @this_task.id, autocomplete: "off" %>
+                <%= f.hidden_field :dependency_id, :id=>"dependency_id_field" %>
+
+                <br /><br />
+            </div>
+          </div>
+          <div class = "cnt-txt">
+            <%= f.submit 'continue', class: 'btn btn-success', id: 'btnMakeTaskDependency' %>
+            <button type="button" class="btn btn-success" data-dismiss="modal">close</button>
+          </div>
           <% end %>
+      </div>    
+    </div>
+    <div class="modal-footer">
 
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Modal for create new dep task pop up-->
+<div class="modal fade" id="createNewDepTask" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <button type="button" class="close" id="close-test-box" data-dismiss="modal" aria-label="Close" id= 'btnCloseCreateNewTaskAsDependency'><span aria-hidden="true">&times;</span></button>
+
+      </div>
+      <div class="modal-body">
+        <div class="cnt-txt">
+          <h3>create new dependency task</h3><br />
+        </div>
+
+        <% @task = Task.new %>
+
+        <% @users_for_selection = User.where(:org_id => current_user.org_id) %>
+
+        <%= simple_form_for @task, url: performer_org_project_tasks_path(@project) do |f| %>
+
+
+          <%= f.input :title, input_html: { id: "task_title" } %>
+          <%= f.input :description, input_html: { id: "task_description" } %>
+         
+          <%= f.hidden_field :user_id, :id => "userid_field" %>
+          
+          <%= f.hidden_field :status, value: "NEW", autocomplete: "off" %>
+          <%= f.hidden_field :due_date, value: calculate_new_task_due_date_from(@this_task), autocomplete: "off" %>
+          <%= f.hidden_field :parent_task, value: @this_task.id, autocomplete: "off" %>
+
+          <!-- select for assigning user to the task to be created -->
+          <div class="row">
+            <div class="col-10">
+              <div id = "optionselectauser" >
+                <select class="task_performer_selection" id="select2insidemodal" style="width:100%;">
+                  <% @users_for_selection.each do |eligble_user| %>
+                    <option></option>
+                    <option value="<%= eligble_user.id %>" data-favourite-color="<%=eligble_user.first_name %>" id="selectUser"><%= eligble_user.email %></option>
+                  <% end %>
+                </select>
+              </div>
+            </div>
+            <div class="col-1">
+              <%= link_to '+', '#', data: {toggle: 'modal', target: '#addUserModal'}, class: 'btn btn-success', id: 'btnShowAddUserModal', remote: true %>
+            </div>
+          </div>
+
+
+          <br /><br />
+
+          <!-- modal buttons -->
+          <div class = "cnt-txt">
+            <%= f.submit 'create task', class: 'btn btn-success', id: 'btnCreateNewDepTask' %>
+            <button type="button" class="btn btn-success" data-dismiss="modal">close</button>
+            
+        </div>
+        <% end %>
 
       </div>
       <div class="modal-footer">
-
+        
       </div>
     </div>
   </div>
@@ -132,33 +241,142 @@
 
 
 
+
+
+
+
+
+
 <script type='text/javascript'>
 
-$(document).ready(function() {
-  $(".js-example-placeholder-single").select2({
-    placeholder: "select existing task as dependency for this task",
-    allowClear: true
+
+
+    // for ensuring that modals remove all data when they close!!
+  $('body').on('hidden.bs.modal', '.modal', function () {
+    $(this).removeData('bs.modal');
   });
 
-  // get the task selected
-  $( "select" )
-    .change(function() {
-    var str = "";
-    $( "select option:selected" ).each(function() {
-      var str = $('#selectTask option:selected').val();
-      $("#dependency_id_field").val(str);
-        alert(str);
+
+
+  $(document).ready(function() { 
+
+    var taskCreationStage = <%= at_task_creation%>;
+    var dropDown = document.getElementById('selectTask option:selected')
+
+
+    // ******** CREATE NEW TASK MODAL**********
+    // initilaise the drop down for task performer selection
+    $("#select2insidemodal").select2({
+      dropdownParent: $("#createNewDepTask")
+    });
+
+
+     // set the placeholder text for select user as task performer
+    $(".task_performer_selection").select2({
+      placeholder: "select a task performer",
+      allowClear: true
+    });
+
+
+    // blank out the previous user input when user clicks close
+    // set the stage flag back to false so next drop down deals with selecting task
+    $("#close-test-box").on('click', function(){
+      $(".task_performer_selection").val([]).trigger("change"); 
+      taskCreationStage = false;
+    });
+
+
+
+    // runs when user clicks continue at the create a new task to be a dependency modal
+    $("#btnCreateNewDepTask").on('click', function(){
+      btnCloseCreateTaskAsDependency = document.getElementById("close");
+      // var userIdForSelectedTaskPerformer = $('#select2insidemodal option:selected').val();
+
+      // btnCloseCreateTaskAsDependency.click();
+//      $(".task_performer_selection").val([]).trigger("change"); 
+      taskCreationStage = false;
+      // alert(taskCreationStage);
+      btnCloseCreateNewTaskAsDependency = document.getElementById("btnCloseCreateNewTaskAsDependency");
+      btnCloseCreateNewTaskAsDependency.click();
+    });
+
+
+
+
+
+    // ** CODE SPECIFC TO MODAL FOR SELECTING EXISTING TASK AS A DEPENDENCY
+
+    // set the placeholder text for all drop downs
+    $(".select_a_task").select2({
+      placeholder: "select a task",
+      allowClear: true
+    });
+
+
+    
+    // should clear out the user entry so blank for next time it appears - not working!
+    $("#btnCloseMakeTaskDependency").on('click', function(){
+      taskCreationStage = false;
+    });
+
+
+    // runs when user clicks the + button to create a new task to be a dependency
+    $("#goto_create_dep_task").on('click', function(){
+      btnCloseMakeTaskDependency = document.getElementById("btnCloseMakeTaskDependency");
+    //  btnCloseMakeTaskDependency.click();
+      taskCreationStage = true;
+    });
+
+
+
+    
+    // get the selection for task selection in assign a task as a dependency modal
+    $( "select" )
+      .change(function() {
+      var selectedTask = "";
+      $( "select option:selected" ).each(function() {
+
+        // assign contents of drop down to hidden text fields dependent on whether
+        // drop down is for selecting an existing task or an existing user (for new task)
+        if (!taskCreationStage) {
+          var selectedTask = $('#selectTask option:selected').val();
+          // alert(selectedTaskPerformer);
+          $("#dependency_id_field").val(selectedTask);
+
+        } else {
+          var userIdForSelectedTaskPerformer = $('#select2insidemodal option:selected').val();
+          
+          // if selected user was just added at this point (i.e. not an existing user) it is identifiable by having a value of zero, therefore get reference to new user...
+          if (userIdForSelectedTaskPerformer == 0 ) {
+            // find user object where the email matches the 'new users' email from
+            $.get( "/orgs").success(function( data ) {
+              data.forEach(function (user) {
+                console.log(user);
+                if (user.email == userEmailForAppendOptionList) {
+                  // alert(user.id);
+                  $('#userid_field').val(user.id);
+                }
+              });                
+            });
+
+          } else {
+            // ...user value not zero, therefore must be an existing user, continue and use value in drop down as normal
+            $('#userid_field').val(userIdForSelectedTaskPerformer);
+          }
+
+
+
+
+
+
+        }
       });
     });
 
-});
-    
+  });
+
+
 </script>
-
-
-
-
-
 
 
 
