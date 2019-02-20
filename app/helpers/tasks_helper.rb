@@ -21,7 +21,7 @@ module TasksHelper
 		else
 			return start_date
 		end
-	end
+	end 
 
 
 	def convert_to_seconds_from(days)
@@ -63,11 +63,7 @@ module TasksHelper
 			dependency_tasks.each do |dependency_task|
 				notify_task_performer_manager_changed_project_end_date(dependency_task,manager)
 			end
-
 		end
-
-
-
 	end
 
 
@@ -98,6 +94,7 @@ module TasksHelper
 		task.duration = 100
 		task.save
 	end
+
 
 
 end
