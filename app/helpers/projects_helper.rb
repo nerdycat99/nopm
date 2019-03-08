@@ -1,5 +1,11 @@
 module ProjectsHelper
 
+
+
+  def project_duration(end_date, start_date)
+    (end_date.to_date - start_date.to_date).to_i
+  end
+
   def is_endpoint(task)
     upstream = Prerequisite.where(:dependency_id => task.id)
     upstream.count < 1 ? true : false
@@ -34,7 +40,6 @@ module ProjectsHelper
   end
 
 
-
   def arrange_dependencies_from(dep_map)
 
     tasks_visited = {} 
@@ -43,6 +48,7 @@ module ProjectsHelper
     arrange_dependencies(tasks_visited, tasks_from_start)
 
   end
+
 
 
   def arrange_dependencies(tasks_visited, remaining_tasks)

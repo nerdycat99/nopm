@@ -1,5 +1,7 @@
 class Performer::TasksController < ApplicationController
 
+  skip_before_action :verify_authenticity_token
+
   include Performer::TasksHelper
 
   def new

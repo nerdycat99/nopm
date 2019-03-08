@@ -1,5 +1,7 @@
 class OrgsController < ApplicationController
 
+  skip_before_action :verify_authenticity_token
+
   include OrgsHelper
 
   def index

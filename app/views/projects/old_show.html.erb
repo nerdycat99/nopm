@@ -1,3 +1,6 @@
+old_show.html.erb
+
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <%= javascript_include_tag "https://www.gstatic.com/charts/loader.js" %>
@@ -36,36 +39,146 @@
           where we have dependencies construct grid onto which we'll plot tasks
      -->
     <% if dep_map.count > 1 %> 
+      <% get_unique_paths(dep_map, false) %> 
 
-      <!-- <% get_unique_paths(dep_map, false) %>  -->
       <% horizontally_sorted = arrange_dependencies_from(dep_map) %> 
       <% vertically_sorted = get_unique_paths(dep_map, false) %>
       <%= tag :meta, :name=> 'sorted_tasks_old', :content=> vertically_sorted.to_json %>
 
-
-      <!-- examine each task at start of a path through project, get earliest start date -->
       <% horizontally_sorted.each do |task| %>
-         <% if task[1] == 0 %>
+        <!-- examine each task at start of a path through project, get earliest start date -->
+        <% if task[1] == 0 %>
           <% this_task_start_date = calculate_task_start_date(task[0].due_date,task[0].duration,false) %>
           <% if this_task_start_date < project_start_date %>
             <% project_start_date = this_task_start_date %>
           <% end %>
         <% end %>
       <% end %>
-      <% project_start_date %>
-      <% project_end_date %>
-      <% duration = project_duration(project_end_date, project_start_date) %>
 
-      <div class="w3-row w3-container">
-        <!-- tasks -->
-        <% xyz = [] %>
-        <% horizontally_sorted.each do |atask| %>
-          <% path = '/orgs/'+@project.org_id.to_s+'/projects/'+@project.id.to_s+'/tasks/'+atask[0].id.to_s %>
-          <% user = User.where(:id => atask[0].user_id).first %>
-          <% xyz.push([atask[0].title, format_date_for_chart_from(calculate_task_start_date(atask[0].due_date,atask[0].duration,false)), format_date_for_chart_from(atask[0].due_date), atask[0].status, atask[0].id, path, user.first_name]) %>
+      <%= project_start_date %>
+      <%= project_end_date %>
+      <%= duration = project_duration(project_end_date, project_start_date) %>
+
+
+
+<div class="wrapper">
+  <div class="item1">x</div>
+  <div class="item2">y</div>
+</div>
+      
+
+<div class="w3-row w3-container">
+  <p>Inside a container:</p>
+  <div class="w3-row">
+    <div class="w3-col m1 w3-center squaredash">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-red w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-blue w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-dark-grey w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-black w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-purple w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-center squaredash">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-red w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-blue w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-dark-grey w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-black w3-center">
+      <p>m2</p>
+    </div>
+    <div class="w3-col m1 w3-purple w3-center">
+      <p>m2</p>
+    </div>
+  </div>
+</div>
+
+    <div class="w3-row w3-container">
+
+      <!-- title row -->
+      <div class="w3-row">
+        <div class="w3-col m2 w3-center">
+          <div class= ""><p>task name</p></div>
+        </div>
+        <% 1.upto(10).each do |column| %>
+
+          <!-- 
+          *** switch, if col 1 use start date, if 10 use end date and calv dates interim by adding duration/10 to prev date used ***
+          *** how to make next row not have a gap and make each row take 2 lines so description fits ***
+          *** how to place a colour bar onto squares based on date start/end/duration
+        
+
+          
+          <div class="w3-col m1"><p><%= format_date_as_string_from(project_start_date) %></p></div>
+          -->
+          <div class="w3-col m1"><p><%= (duration / 10) * column %></p></div>
+          
+          
         <% end %>
-        <%= tag :meta, :name=> 'sorted_tasks', :content=> xyz.to_json %>
       </div>
+
+      <!-- tasks -->
+      <% xyz = [] %>
+      <% vertically_sorted.each do |atask| %>
+        <% xyz.push([atask.title, format_date_for_chart_from(calculate_task_start_date(atask.due_date,atask.duration,false)), format_date_for_chart_from(atask.due_date), atask.status,atask.id]) %>
+      <% end %>
+      <%= tag :meta, :name=> 'sorted_tasks', :content=> xyz.to_json %>
+
+<%= timeline xyz, colors: ["green"], 
+  library: {backgroundColor: "#FFF", height: 265} %>
+
+
+
+
+      <% vertically_sorted.each do |atask| %>
+        <div class="w3-row">
+          <div class="w3-col m2 w3-center">
+            <p><%= atask.title %></p>
+          </div>
+          <% 1.upto(10).each do |column| %>
+            <div class="w3-col m1 squaredash">
+              <div class="wrapper">
+                <div class="item1">x</div>
+                <div class="item2">y</div>
+              </div>
+            </div>
+          <% end %>
+
+        </div>
+
+          <div class="col11">
+
+            <% horizontal_position = horizontally_sorted.assoc atask %>
+            <% link_title = "___________________" * horizontal_position[1] %>
+            <% link_title = link_title + atask.id.to_s %>
+            <% link_to link_title, org_project_task_path(current_user.org, @project.id, atask.id), class: 'nav-link' %>
+
+          </div>
+
+
+
+      <% end %>
+
+
+
+    </div>
+
 
 
     <% else %>
@@ -100,8 +213,10 @@
         let jsonDataTasks = $('meta[name=sorted_tasks]').attr('content');
         let tasks = JSON.parse(jsonDataTasks);
         
-       // console.log(tasks);
+        console.log(tasks);
        
+        
+
         tasks_for_display = [];
         for (index = 0; index < tasks.length; ++index) {
           var barcolor = ''
@@ -111,7 +226,7 @@
             barColor = 'red'
           }
           
-          tasks_for_display.push([ tasks[index][0], tasks[index][6], barColor, new Date(tasks[index][1]), new Date(tasks[index][2]) ]);
+          tasks_for_display.push([ tasks[index][0], "", barColor, new Date(tasks[index][1]), new Date(tasks[index][2]) ]);
         };
       
 
@@ -129,69 +244,12 @@
         dataTable.addColumn({ type: 'date', id: 'End' });
         dataTable.addRows(tasks_for_display);
 
-        //calc the height for the overall chart
-        var rowHeight = 41;
-        var chartHeight = dataTable.getNumberOfRows() * rowHeight + 50;
-
-        options = {
-          height: chartHeight
-        }
-
-        var chart = new google.visualization.Timeline(document.getElementById('timeline'));
-
-        chart.draw(dataTable, options);
-        adjustChartDisplay(container)
-
-          var handler = function(e) {
-            let sel = chart.getSelection();
-            let row = (sel[0].row);
-
-            document.location.href = tasks[row][5];
-
-
-          }
-          google.visualization.events.addListener(chart, 'select', handler);
-
-
+        chart.draw(dataTable);
       }
 
 
-      function adjustChartDisplay(container) {
-      // chartElements = container.firstChild.firstChild.firstChild.firstChild.children[1].firstChild.children[1].children;
-
-
-      chartElements = container.firstChild.firstChild.firstChild.firstChild.children[1].children;
-
-        console.log(chartElements);
-
-        for (var i = 0; i < chartElements.length; i++) {
-          var element = chartElements[i];
-          // var str = ''+element+''.substring(2,3);
-          identifier = element.getAttribute('stroke-width');
-          fillColor = element.getAttribute('fill');
-          strokeColor = element.getAttribute('stroke');
-
-          
-          if (identifier == 0 && fillColor == "#e6e6e6" ) {
-            element.setAttribute('fill', '#ffffff');
-          }
-
-          if (identifier == 1 && strokeColor == "#e6e6e6") {
-            element.setAttribute('stroke', '#ffffff');
-          }
-
-
-          //console.log(element.getAttribute('fill'));
-
-          
-        }
-
-        var element = chartElements[0];
-
-        
-
-
-        
+      function myFunction(value) {
+        console.log(value);
       }
 
 

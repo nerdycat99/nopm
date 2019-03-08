@@ -10,6 +10,10 @@ module TasksHelper
 		date.strftime("%d/%m/%Y")
 	end
 
+	def format_date_for_chart_from(date)
+		date.strftime("%Y, %-m, %-d")
+	end
+
 	def calculate_task_start_date(end_date,duration,as_string)
 		if duration == nil
 			return "no start date set"

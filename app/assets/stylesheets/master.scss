@@ -146,6 +146,58 @@ li.dropdown:last-child .dropdown-menu {
 }
 
 
+.squaredash {
+  border-width: 0.5px;
+  border-color: grey;
+  border-top-style: dotted;
+  border-left-style: dotted;
+  border-right-style: dotted;
+  border-bottom-style: dotted;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* {box-sizing: border-box;}
+
+.wrapper {
+  border: 2px solid #f76707;
+  border-radius: 5px;
+  background-color: #fff4e6;
+}
+
+.wrapper > div {
+  border: 2px solid #ffa94d;
+  border-radius: 5px;
+  background-color: #ffd8a8;
+  padding: 1em;
+  color: #d9480f;
+}
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(12, [col-start] 1fr);
+}
+.item1 {
+  grid-column: col-start / col-start 5;
+}
+.item2 {
+  grid-column: col-start 12 / span 1;
+}
+
+
+
+
+
 
 
 

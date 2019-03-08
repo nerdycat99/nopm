@@ -55,6 +55,7 @@ gem 'devise'
 gem 'simple_form'
 gem 'pickadate-rails'
 gem 'font-awesome-rails', '~> 4.5'
+gem "chartkick"
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-tether', '>= 1.3.3'
