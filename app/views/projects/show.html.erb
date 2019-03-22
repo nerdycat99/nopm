@@ -89,6 +89,14 @@
 
 
     <script type="text/javascript">
+
+      $(document).ready(function () {
+        $(window).resize(function(){
+            drawChart();
+        });
+      });
+
+
       google.charts.load('current', {'packages':['timeline']});
       google.charts.setOnLoadCallback(drawChart);
 

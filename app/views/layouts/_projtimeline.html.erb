@@ -1,0 +1,70 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<%= javascript_include_tag "https://www.gstatic.com/charts/loader.js" %>
+<div class="modal fade" id="projtimeline" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseShowDepTaskModal'>
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title">Modal Header</h4>
+      </div>
+      
+      <div class="modal-body">
+          <div id="timelineX" style="width: 100%; height: 100%;"></div>
+
+      </div>
+            <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+//  $(document).ready(function () {
+    $(window).resize(function(){
+        drawChart();
+    });
+//  });
+
+  $(document).ready(function () {
+
+    google.charts.load('current', {'packages':['timeline']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      var container = document.getElementById('timelineX');
+      var chart = new google.visualization.Timeline(container);
+      var dataTable = new google.visualization.DataTable();
+
+
+      dataTable.addColumn({ type: 'string', id: 'President' });
+      dataTable.addColumn({ type: 'date', id: 'Start' });
+      dataTable.addColumn({ type: 'date', id: 'End' });
+      dataTable.addRows([
+        [ 'Washington', new Date(1789, 3, 30), new Date(1797, 2, 4) ],
+        [ 'Adams',      new Date(1797, 2, 4),  new Date(1801, 2, 4) ],
+        [ 'Jefferson',  new Date(1815, 2, 4),  new Date(1819, 2, 4) ]]);
+
+      //calc the height for the overall chart
+      var rowHeight = 41;
+      var chartHeight = dataTable.getNumberOfRows() * rowHeight + 50;
+
+      var options = {
+        // width: 750,
+        width: $(window).width() / 1.7,
+        height: chartHeight
+      }
+
+      var chart = new google.visualization.Timeline(document.getElementById('timelineX'));
+
+      chart.draw(dataTable, options);
+
+    }
+
+  });
+</script>
