@@ -1,3 +1,37 @@
-// Place all the styles related to the Tasks controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+@import "bootstrap";
+
+.halfscreentop { height: 40vh; }
+
+.halfscreenbottom { height: 30vh; }
+
+.halfscreenfooter { height: 7vh; }
+
+.vertical-menu {
+  width: 100%;
+  height: 20vh;
+  overflow-y: scroll;
+}
+
+.vertical-menu a {
+  background-color: #eee;
+  color: black;
+  display: block;
+  padding: 12px;
+  text-decoration: none;
+}
+
+.vertical-menu a:hover {
+  background-color: #ccc;
+}
+
+.vertical-menu a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.outer-containers {
+  border-radius: 25px;
+  border: 2px solid #73AD21;
+  padding: 20px; 
+  background-color: #fff; 
+}

@@ -7,84 +7,220 @@
 
 <% @project = Project.where(:id => @this_task.project_id).first %>
 
-<h1>task performers show task page</h1>
+<h1></h1>
 <br /><br />
-<div class="col12 offset-1">
+<div class="col12">
+  <!-- Top section 12 wide project details pane -->
   <div class="row">
-    <div class="booyah-box col-6">
-        <h3>@project: <%= @project.name %></h3>
+    <div class="col-10 offset-1">
+      <div class="outer-containers halfscreentop">
+
+        <div class="row">
+          <div class="col-2"><h4>project name:<h4></div>
+          <div class="col-7"><h4><%= @project.name %></h4></div>
+          <div class="col-3 text-right"><h4>project status: XXX</h4></div>
+        </div>
         <br />
-        <h6>task: <%= @this_task.title %></h6>
-        status: <%= @this_task.status %><br />
-        description: <%= @this_task.description %><br />
+        <div class="row">
+          <div class="col-2"><h4>task name:<h4></div>
+          <div class="col-7"><h4><%= @this_task.title %></h4></div>
+          <div class="col-3 text-right"><h4>status: <%= @this_task.status %></h4></div>
+        </div>
+        <div class="row">
+          <div class="col-2"><h5>description:<h5></div>
+          <div class="col-7"><h5><%= @this_task.description %></h5></div>
+        </div>
         <% if @this_task.status != "NEW" %>
-          duration: <%= @this_task.duration %><br />
-          start date: <%= calculate_task_start_date(@this_task.due_date,@this_task.duration,true) %> - 
+          <div class="row">
+            <div class="col-2"><h5>duration:<h5></div>
+            <div class="col-7"><h5><%= @this_task.duration %></h5></div>
+          </div>
+          <div class="row">
+            <div class="col-2"><h5>start date:<h5></div>
+            <div class="col-7"><h5><%= calculate_task_start_date(@this_task.due_date,@this_task.duration,true) %></h5></div>
+          </div>
         <% end %>
-        due date: <%= format_date_as_string_from(@this_task.due_date) %><br />
-        assigned to: <%= user.email %><br /><br />
+        <div class="row">
+          <div class="col-2"><h5>due date:<h5></div>
+          <div class="col-7"><h5><%= format_date_as_string_from(@this_task.due_date) %></h5></div>
+        </div>
 
-        <% if user_assigned_to_this_task %>
-          <% if @this_task.status == "NEW" || @this_task.status == "REA" %>
-            <%= link_to 'accept task', '#', data: {toggle: 'modal', target: '#acptask'}, class: 'btn btn-success', id: 'btnAcceptTask', remote: true %>
-            <%= link_to 'reassign task', '#', data: {toggle: 'modal', target: '#reassigntask'}, class: 'btn btn-success', id: 'btnReassignTask', remote: true %>
-            <%= link_to 'reject task', '#', data: {toggle: 'modal', target: '#rejecttask'}, class: 'btn btn-success', id: 'btnRejectTask', remote: true %>
-          <% else %>
-            <%= link_to "edit task", edit_performer_org_project_task_path(current_user.org, @this_task.project_id, @this_task), class: 'btn btn-success' %>
-          <% end %>
-        <% end %>
-
-    </div>
-
-    <%= render "layouts/acptask" %>
-    <%= render "layouts/reassigntsk" %>
-    <%= render "layouts/rejecttask" %>
-    <%= render "layouts/modal" %>
-
-    <div class="booyah-box col-4">
-      <h3>Dependencies For This Task</h3>
-      <br />
-      <% @this_task.prerequisites.inspect %>
-      <% @this_task.dependencys.each do |dependency| %>
-      <%= link_to dependency.title, performer_org_project_task_path(current_user.org, @this_task.project_id, dependency.id), class: 'nav-link' %><br />
-      <% end %>
-      <br />
-      <div class = "cnt-txt">
-        <% if user_assigned_to_this_task %>
-          <% if @this_task.status == "NEW" || @this_task.status == "REA" %>
-            <h5>you will need to accept this task first then you can create dependency tasks </h5>
-          <% else %>
-            <%= link_to 'add a dependency<br />for this task'.html_safe, '#', data: {toggle: 'modal', target: '#modal_assign_dep'}, class: 'btn btn-success', id: 'btnCreateDepTask' %>
-          <% end %>
-        <% end %>
       </div>
     </div>
-
   </div>
-</div>
+
+  <%= render "layouts/acptask" %>
+  <%= render "layouts/reassigntsk" %>
+  <%= render "layouts/rejecttask" %>
+  <%= render "layouts/modal" %>
+  <%= render "layouts/projtimeline" %>
 
   <br />
-  <% tasks_dependent_upon_task = Prerequisite.where(:dependency_id => @this_task.id) %>
-  <% if tasks_dependent_upon_task.count < 1 %>
-    <h3>This Task is the EndPoint</h3>
-  <% else %>
-    <h3>Tasks Dependent Upon This Task</h3>
-  <% end %>
-    
-    <% tasks_dependent_upon_task.each do |dependency| %>
-    <%= dependency.task.title %><br />
-    <% end %>
+  <!-- Bottom section....-->
+  <div class="row">
+      <!-- ... 5 wide Pre-Requisites pane -->
+      <div class="col-5 offset-1">
+        <div class="outer-containers halfscreenbottom">
+          <div class="cnt-txt"><h4>Dependencies For This Task</h4></div>
+          <br /><br />
+
+          <!-- For each dependency task generate link to the task detail modal and modal itself -->
+          <div class="vertical-menu">
+          <% @this_task.dependencys.each do |dependency| %>
+            <% modal_name = dependency.id.to_s %>
+            <div class="modal fade" id="<%= '%s' % [modal_name] %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close", id= 'btnCloseShowDepTaskModal'>
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="cnt-txt">
+                      <h4><%= dependency.title %></h4><br />
+                    </div>
+                    <div class="row">
+                      <div class="col-10 offset-1">
+        <!-- DESC -->   <div class="row">
+                          <div class ="col-4">
+                            <h7>description:</h7>
+                          </div>
+                          <div class ="col-8">
+                            <h7><%=dependency.description %></h7><br />
+                          </div>
+                        </div>
+        <!-- USER -->   <div class="row">
+                          <div class ="col-4">
+                            <% user = User.where(:id => dependency.user_id).first %>
+                            <h7>assigned to:</h7>
+                          </div>
+                          <div class ="col-8">
+                            <h7><%= user.email %></h7><br />
+                          </div>
+                        </div>
+
+                        <% if dependency.status != "NEW" %>
+          <!-- STRT -->   <div class="row">
+                            <div class ="col-4">
+                              <h7>start date:</h7>
+                            </div>
+                            <div class ="col-8">
+                              <h7><%= calculate_task_start_date(dependency.due_date,dependency.duration,true) %></h7><br />
+                            </div>
+                          </div>
+          <!-- DURA -->   <div class="row">
+                            <div class ="col-4">
+                              <h7>task duration:</h7>
+                            </div>
+                            <div class ="col-8">
+                              <h7> <%= dependency.duration %></h7><br />
+                            </div>
+                          </div>
+                        <% end %>
+
+        <!-- DURA -->   <div class="row">
+                          <div class ="col-4">
+                            <h7>due date:</h7>
+                          </div>
+                          <div class ="col-8">
+                            <h7><%= format_date_as_string_from(dependency.due_date) %></h7><br />
+                          </div>
+                        </div>
+        <!-- STAT -->   <div class="row">
+                          <div class ="col-4">
+                            <h7>task status:</h7>
+                          </div>
+                          <div class ="col-8">
+                            <h7><%= dependency.status %></h7><br />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br /><br />
+                    <div class="cnt-txt">
+                        <button type="button" class="btn btn-success" data-dismiss="modal" aria-label="Close", id= 'btnCloseShowDepTask'>back</button>
+                        <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% target_var = "#"+modal_name %> 
+            <%= link_to dependency.title, '#', data: {toggle: 'modal', target: target_var }, class: 'nav-link', remote: true %><br />
+          <% end %>
+          </div>
+        </div>
+      </div>
+
+ 
+
+      <!-- ... and 5 wide Dependencies pane -->
+      <div class="col-5">
+        <div class="outer-containers halfscreenbottom">
+          
+          <% tasks_dependent_upon_task = Prerequisite.where(:dependency_id => @this_task.id) %>
+          <% if tasks_dependent_upon_task.count < 1 %>
+            <div class="cnt-txt">
+              <h4>This Task is the EndPoint</h4>
+              <br /><br />
+              <h5>there are no tasks that follow this task, this task is the final activity in the project</h5>
+            </div>
+          <% else %>
+            <h4>Tasks Dependent Upon This Task</h4>
+            <div class="vertical-menu">
+              <% tasks_dependent_upon_task.each do |dependency| %>
+                <%= dependency.task.title %><br />
+              <% end %>
+            </div>
+          <% end %>
+
+        </div>
+      </div>
+
+  </div>
+
+
+
+
 
 <br />
-<div class = "cnt-txt">
-  <% if user_assigned_to_this_task %>
-    <%= link_to 'back to project page', performer_org_project_path(current_user.org, @this_task.project_id), class: 'btn btn-success' %>
-  <% else %>
-    <%= link_to 'back', :back, class: 'btn btn-success' %>
-  <% end %>
-  <%= link_to 'help', '#', data: {toggle: 'modal', target: '#myModal'}, class: 'btn btn-success' %>
+
+  <!-- section at bottom for buttons-->
+  <div class="row halfscreenfooter">
+    <div class="col-10 offset-1">
+      <div class="cnt-txt outer-containers ">
+        <% if user_assigned_to_this_task %>
+          <% if @this_task.status == "NEW" || @this_task.status == "REA" %>
+            <h5>you will need to accept this task first then you can create dependency tasks </h5><br />
+          <% else %>
+            <%= link_to 'add dependency<br />for this task'.html_safe, '#', data: {toggle: 'modal', target: '#modal_assign_dep'}, class: 'btn btn-success', id: 'btnCreateDepTask' %>
+          <% end %>
+        <% end %>
+
+        <% if user_assigned_to_this_task %>
+          <% if @this_task.status == "NEW" || @this_task.status == "REA" %>
+            <%= link_to 'accept<br />this task'.html_safe, '#', data: {toggle: 'modal', target: '#acptask'}, class: 'btn btn-success', id: 'btnAcceptTask', remote: true %>
+            <%= link_to 'reassign<br /> this task'.html_safe, '#', data: {toggle: 'modal', target: '#reassigntask'}, class: 'btn btn-success', id: 'btnReassignTask', remote: true %>
+            <%= link_to 'reject<br />this task'.html_safe, '#', data: {toggle: 'modal', target: '#rejecttask'}, class: 'btn btn-success', id: 'btnRejectTask', remote: true %>
+          <% else %>
+            <%= link_to "edit<br />this task".html_safe, edit_performer_org_project_task_path(current_user.org, @this_task.project_id, @this_task), class: 'btn btn-success' %>
+          <% end %>
+        <% end %>
+        <% if user_assigned_to_this_task %>
+            <%= link_to 'back to<br />project'.html_safe, performer_org_project_path(current_user.org, @this_task.project_id), class: 'btn btn-success' %>
+        <% else %>
+          <%= link_to 'back to<br />project'.html_safe, :back, class: 'btn btn-success' %>
+        <% end %>
+        <%= link_to 'view project<br />timeline'.html_safe, '#', data: {toggle: 'modal', target: '#projtimeline'}, class: 'btn btn-success' %>
+      </div>
+    </div>
+  </div>
+
 
 </div>
+
+
 
 
 
@@ -248,7 +384,6 @@
 
 
 <script type='text/javascript'>
-
 
 
     // for ensuring that modals remove all data when they close!!
